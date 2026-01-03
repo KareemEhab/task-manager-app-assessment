@@ -1,4 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -19,8 +20,7 @@ export default function OnboardingScreen() {
   };
 
   const handleSignUp = () => {
-    // Navigate to sign up screen
-    console.log("Sign Up pressed");
+    router.push("/sign-up");
   };
 
   return (
