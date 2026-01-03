@@ -50,4 +50,3 @@ export const categories: Category[] = [
     gradientColors: ["#FA709A", "#FEE140"],
   },
 ];
-

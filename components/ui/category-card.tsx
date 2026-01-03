@@ -55,9 +55,7 @@ export function CategoryCard({
         style={[
           styles.footerSection,
           {
-            backgroundColor: isDark
-              ? DarkColors.darkBorder
-              : CommonColors.white,
+            backgroundColor: isDark ? DarkColors.darkText : CommonColors.white,
           },
         ]}
       >

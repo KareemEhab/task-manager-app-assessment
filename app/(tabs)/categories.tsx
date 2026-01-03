@@ -62,7 +62,11 @@ export default function CategoriesScreen() {
     <SafeAreaView
       style={[
         styles.container,
-        { backgroundColor: isDark ? DarkColors.dark1 : LightColors.light4 },
+        {
+          backgroundColor: isDark
+            ? DarkColors.darkBackground
+            : LightColors.light4,
+        },
       ]}
       edges={["top"]}
     >

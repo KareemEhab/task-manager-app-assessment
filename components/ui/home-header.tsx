@@ -26,7 +26,7 @@ export function HomeHeader({ userName = "Krish Shah" }: HomeHeaderProps) {
         style={[
           styles.container,
           {
-            backgroundColor: isDark ? DarkColors.dark1 : LightColors.light4,
+            backgroundColor: isDark ? DarkColors.darkText : LightColors.light4,
           },
         ]}
       >
