@@ -12,9 +12,16 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { BrandColors, CommonColors } from "@/constants/theme";
+import {
+  BrandColors,
+  CommonColors,
+  DarkColors,
+  LightColors,
+  TextColors,
+} from "@/constants/theme";
+import { useTheme } from "@/contexts/theme-context";
 
-type ButtonVariant = "primary" | "primary-transparent";
+type ButtonVariant = "primary" | "primary-transparent" | "danger" | "cancel";
 
 export type ButtonProps = Omit<PressableProps, "style"> & {
   variant?: ButtonVariant;
@@ -32,8 +39,11 @@ export function Button({
   style,
   ...props
 }: ButtonProps) {
+  const { isDark } = useTheme();
   const isPrimary = variant === "primary";
   const isTransparent = variant === "primary-transparent";
+  const isDanger = variant === "danger";
+  const isCancel = variant === "cancel";
 
   const handlePress = (event: any) => {
     if (Platform.OS === "ios") {
@@ -52,6 +62,13 @@ export function Button({
           styles.base,
           isPrimary && styles.primary,
           isTransparent && styles.primaryTransparent,
+          isDanger && styles.danger,
+          isCancel && [
+            styles.cancel,
+            {
+              borderColor: isDark ? DarkColors.dark4 : LightColors.lightBorder,
+            },
+          ],
           disabled && styles.disabled,
           pressed && styles.pressed,
           style,
@@ -59,13 +76,23 @@ export function Button({
         android_ripple={{
           color: isPrimary
             ? "rgba(255, 255, 255, 0.2)"
+            : isDanger
+            ? "rgba(255, 255, 255, 0.2)"
             : "rgba(51, 119, 255, 0.1)",
           borderless: false,
         }}
       >
         {loading ? (
           <ActivityIndicator
-            color={isPrimary ? CommonColors.white : BrandColors.main}
+            color={
+              isPrimary || isDanger
+                ? CommonColors.white
+                : isCancel
+                ? isDark
+                  ? CommonColors.white
+                  : TextColors.primary
+                : BrandColors.main
+            }
             size="small"
           />
         ) : (
@@ -74,6 +101,11 @@ export function Button({
               styles.text,
               isPrimary && styles.primaryText,
               isTransparent && styles.primaryTransparentText,
+              isDanger && styles.dangerText,
+              isCancel && [
+                styles.cancelText,
+                { color: isDark ? CommonColors.white : TextColors.primary },
+              ],
             ]}
           >
             {title}
@@ -101,13 +133,28 @@ export function Button({
         styles.base,
         isPrimary && styles.primary,
         isTransparent && styles.primaryTransparent,
+        isDanger && styles.danger,
+        isCancel && [
+          styles.cancel,
+          {
+            borderColor: isDark ? DarkColors.dark4 : LightColors.lightBorder,
+          },
+        ],
         disabled && styles.disabled,
         style,
       ]}
     >
       {loading ? (
         <ActivityIndicator
-          color={isPrimary ? CommonColors.white : BrandColors.main}
+          color={
+            isPrimary || isDanger
+              ? CommonColors.white
+              : isCancel
+              ? isDark
+                ? CommonColors.white
+                : TextColors.primary
+              : BrandColors.main
+          }
           size="small"
         />
       ) : (
@@ -116,6 +163,11 @@ export function Button({
             styles.text,
             isPrimary && styles.primaryText,
             isTransparent && styles.primaryTransparentText,
+            isDanger && styles.dangerText,
+            isCancel && [
+              styles.cancelText,
+              { color: isDark ? CommonColors.white : TextColors.primary },
+            ],
           ]}
         >
           {title}
@@ -157,6 +209,19 @@ const styles = StyleSheet.create({
   },
   primaryTransparentText: {
     color: BrandColors.main,
+    fontWeight: "600",
+  },
+  danger: {
+    backgroundColor: CommonColors.error,
+  },
+  dangerText: {
+    color: CommonColors.white,
+  },
+  cancel: {
+    backgroundColor: "transparent",
+    borderWidth: 2,
+  },
+  cancelText: {
     fontWeight: "600",
   },
 });
