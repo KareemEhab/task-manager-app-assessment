@@ -33,6 +33,7 @@ const getStyles = (isDark: boolean, variant: TagVariant) =>
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 12,
+      alignSelf: "flex-start",
       backgroundColor:
         variant === "low"
           ? "#4CAF50"
