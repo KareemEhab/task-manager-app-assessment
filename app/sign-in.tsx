@@ -12,9 +12,9 @@ import {
   View,
 } from "react-native";
 
-import { LightColors, TextColors } from "@/constants/theme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BrandColors, LightColors, TextColors } from "@/constants/theme";
 import { validateLogin } from "@/utils/validation";
 
 export default function SignInScreen() {
