@@ -28,6 +28,11 @@ export const LightColors = {
   light4: "#FAFAFC",
 };
 
+// Common Colors
+export const CommonColors = {
+  error: "#EF4444",
+};
+
 export const Colors = {
   light: {
     text: DarkColors.dark1,
