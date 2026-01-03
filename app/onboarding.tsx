@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 
+import { BrandColors, TextColors } from "@/constants/theme";
 import { Button } from "@/components/ui/button";
 import { ImageSlider } from "@/components/ui/image-slider";
 
@@ -26,7 +27,7 @@ export default function OnboardingScreen() {
     <View style={styles.container}>
       <StatusBar style="light" />
       <LinearGradient
-        colors={["#3377FF", "#E3EDFF"]}
+        colors={[BrandColors.main, BrandColors.subtle]}
         style={styles.gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
@@ -94,14 +95,14 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     lineHeight: 40,
-    color: "#1F2937",
+    color: TextColors.primary,
     marginBottom: 12,
     textAlign: "center",
   },
   subheader: {
     fontSize: 16,
     lineHeight: 24,
-    color: "#6B7280",
+    color: TextColors.secondary,
     marginBottom: 32,
     textAlign: "center",
   },

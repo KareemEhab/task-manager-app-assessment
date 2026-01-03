@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 
+import { BrandColors, LightColors, TextColors } from "@/constants/theme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { validateSignUp } from "@/utils/validation";
@@ -157,7 +158,7 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAFAFC",
+    backgroundColor: LightColors.light4,
   },
   scrollView: {
     flex: 1,
@@ -175,13 +176,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#1F2937",
+    color: TextColors.primary,
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: "#6B7280",
+    color: TextColors.secondary,
     textAlign: "center",
     marginBottom: 32,
   },
@@ -202,11 +203,11 @@ const styles = StyleSheet.create({
   },
   accountText: {
     fontSize: 14,
-    color: "#6B7280",
+    color: TextColors.secondary,
   },
   signInLink: {
     fontSize: 14,
-    color: "#3377FF",
+    color: BrandColors.main,
     fontWeight: "600",
   },
 });

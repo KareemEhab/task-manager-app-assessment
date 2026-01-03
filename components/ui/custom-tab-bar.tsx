@@ -3,7 +3,12 @@ import { router } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { BrandColors, DarkColors } from "@/constants/theme";
+import {
+  BrandColors,
+  CommonColors,
+  DarkColors,
+  LightColors,
+} from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { NavButton } from "./nav-button";
@@ -38,8 +43,10 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
       style={[
         styles.container,
         {
-          backgroundColor: isDark ? "#1F2937" : "#FFFFFF",
-          borderTopColor: isDark ? "#374151" : "#E5E7EB",
+          backgroundColor: isDark ? DarkColors.darkText : CommonColors.white,
+          borderTopColor: isDark
+            ? DarkColors.darkBorder
+            : LightColors.lightBorder,
           paddingBottom: insets.bottom,
         },
       ]}
@@ -88,7 +95,7 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
         onPress={handleAddPress}
         activeOpacity={0.8}
       >
-        <Ionicons name="add" size={32} color="#FFFFFF" />
+        <Ionicons name="add" size={32} color={CommonColors.white} />
       </TouchableOpacity>
 
       <View style={styles.navButtons}>

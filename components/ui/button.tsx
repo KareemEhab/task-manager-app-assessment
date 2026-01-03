@@ -12,7 +12,7 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { BrandColors } from "@/constants/theme";
+import { BrandColors, CommonColors } from "@/constants/theme";
 
 type ButtonVariant = "primary" | "primary-transparent";
 
@@ -65,7 +65,7 @@ export function Button({
       >
         {loading ? (
           <ActivityIndicator
-            color={isPrimary ? "#FFFFFF" : BrandColors.main}
+            color={isPrimary ? CommonColors.white : BrandColors.main}
             size="small"
           />
         ) : (
@@ -107,7 +107,7 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator
-          color={isPrimary ? "#FFFFFF" : BrandColors.main}
+          color={isPrimary ? CommonColors.white : BrandColors.main}
           size="small"
         />
       ) : (
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   primaryText: {
-    color: "#FFFFFF",
+    color: CommonColors.white,
   },
   primaryTransparentText: {
     color: BrandColors.main,

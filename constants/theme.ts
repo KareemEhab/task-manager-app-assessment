@@ -18,6 +18,8 @@ export const DarkColors = {
   dark2: "#687588",
   dark3: "#8B90A6",
   dark4: "#C7C9D9",
+  darkText: "#1F2937",
+  darkBorder: "#374151",
 };
 
 // Light Colors
@@ -26,11 +28,20 @@ export const LightColors = {
   light2: "#EBEBF0",
   light3: "#F2F2F6",
   light4: "#FAFAFC",
+  lightBorder: "#E5E7EB",
+};
+
+// Text Colors
+export const TextColors = {
+  primary: "#1F2937",
+  secondary: "#6B7280",
+  placeholder: "#9CA3AF",
 };
 
 // Common Colors
 export const CommonColors = {
   error: "#EF4444",
+  white: "#FFFFFF",
 };
 
 export const Colors = {

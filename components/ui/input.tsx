@@ -9,7 +9,12 @@ import {
   View,
 } from "react-native";
 
-import { BrandColors, CommonColors, LightColors } from "@/constants/theme";
+import {
+  BrandColors,
+  CommonColors,
+  LightColors,
+  TextColors,
+} from "@/constants/theme";
 
 export type InputProps = TextInputProps & {
   label: string;
@@ -48,7 +53,7 @@ export function Input({
             hasError && styles.inputError,
           ]}
           placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={TextColors.placeholder}
           value={value}
           onChangeText={onChangeText}
           secureTextEntry={isPassword && !isPasswordVisible}
@@ -64,7 +69,7 @@ export function Input({
             <Ionicons
               name={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
               size={20}
-              color="#6B7280"
+              color={TextColors.secondary}
             />
           </TouchableOpacity>
         )}
@@ -83,7 +88,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#1F2937",
+    color: TextColors.primary,
     marginBottom: 8,
   },
   inputContainer: {
@@ -98,7 +103,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingRight: 50,
     fontSize: 16,
-    color: "#1F2937",
+    color: TextColors.primary,
   },
   inputFilled: {
     backgroundColor: LightColors.light3,
