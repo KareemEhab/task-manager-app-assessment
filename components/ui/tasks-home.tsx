@@ -10,9 +10,14 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task, tasks } from "@/data/tasks";
+import { Task } from "@/data/tasks";
 
-export function TasksHome() {
+type TasksHomeProps = {
+  tasks: Task[];
+  onTaskPress: (task: Task) => void;
+};
+
+export function TasksHome({ tasks, onTaskPress }: TasksHomeProps) {
   const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<"active" | "completed">("active");
   const styles = getStyles(isDark);
@@ -43,7 +48,7 @@ export function TasksHome() {
       </View>
       <View style={styles.tasksContainer}>
         {filteredTasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} onPress={() => onTaskPress(task)} />
         ))}
       </View>
     </View>

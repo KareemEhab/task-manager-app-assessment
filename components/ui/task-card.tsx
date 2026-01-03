@@ -1,4 +1,3 @@
-import { router } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -15,15 +14,15 @@ import { Task } from "@/data/tasks";
 
 type TaskCardProps = {
   task: Task;
+  onPress?: () => void;
 };
 
-export function TaskCard({ task }: TaskCardProps) {
+export function TaskCard({ task, onPress }: TaskCardProps) {
   const { isDark } = useTheme();
   const styles = getStyles(isDark);
 
   const handlePress = () => {
-    // Navigate to task detail screen (to be implemented)
-    router.push(`/(tabs)/task/${task.id}` as any);
+    onPress?.();
   };
 
   const formatDate = (date: Date) => {

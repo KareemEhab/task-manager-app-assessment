@@ -18,6 +18,10 @@ export default function TabLayout() {
         name="categories"
         options={{ title: "Categories", href: null }}
       />
+      <Tabs.Screen
+        name="task-details"
+        options={{ title: "Task Details", href: null }}
+      />
     </Tabs>
   );
 }
