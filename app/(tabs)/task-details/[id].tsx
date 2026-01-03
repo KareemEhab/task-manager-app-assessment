@@ -30,7 +30,7 @@ import { Task, TaskComment, tasks } from "@/data/tasks";
 import { useTasks } from "@/hooks/useTasks";
 
 export default function TaskDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const { isDark } = useTheme();
   const [task, setTask] = useState<Task | null>(null);
   const [activeTab, setActiveTab] = useState<"details" | "comments">("details");
@@ -147,7 +147,14 @@ export default function TaskDetailsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => {
+              // If we came from calendar, navigate back to calendar
+              if (from === "calendar") {
+                router.replace("/(tabs)/calendar" as any);
+              } else {
+                router.back();
+              }
+            }}
             style={styles.backButton}
             activeOpacity={0.7}
           >
@@ -279,7 +286,14 @@ export default function TaskDetailsScreen() {
             <Button
               variant="cancel"
               title="Close"
-              onPress={() => router.back()}
+              onPress={() => {
+                // If we came from calendar, navigate back to calendar
+                if (from === "calendar") {
+                  router.replace("/(tabs)/calendar" as any);
+                } else {
+                  router.back();
+                }
+              }}
               style={styles.footerButton}
             />
           </View>

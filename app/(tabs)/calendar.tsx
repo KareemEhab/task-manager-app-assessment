@@ -1,20 +1,19 @@
-import { StyleSheet } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
+import { CalendarTab } from "@/components/ui/calendar/calendar-tab";
+import { getCalendarStyles } from "@/components/ui/calendar/calendar.styles";
+import { useTheme } from "@/contexts/theme-context";
+import { tasks } from "@/data/tasks";
 
 export default function CalendarScreen() {
+  const { isDark } = useTheme();
+  const styles = getCalendarStyles(isDark);
+
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Calendar</ThemedText>
-    </ThemedView>
+    <SafeAreaView style={styles.container} edges={["top"]}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <CalendarTab tasks={tasks} />
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
