@@ -18,7 +18,7 @@ export default function TabLayout() {
         options={{ title: "Categories", href: null }}
       />
       <Tabs.Screen
-        name="task-details"
+        name="task-details/[id]"
         options={{ title: "Task Details", href: null }}
       />
     </Tabs>
