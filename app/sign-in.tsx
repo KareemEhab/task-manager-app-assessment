@@ -12,8 +12,8 @@ import {
   View,
 } from "react-native";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/common/button/button";
+import { Input } from "@/components/common/input/input";
 import { BrandColors, LightColors, TextColors } from "@/constants/theme";
 import { validateLogin } from "@/utils/validation";
 

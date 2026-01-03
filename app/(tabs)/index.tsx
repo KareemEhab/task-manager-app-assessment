@@ -1,3 +1,4 @@
+import { StatusBar } from "expo-status-bar";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { HomeHeader } from "@/components/ui/home-header";
@@ -8,25 +9,6 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-
-export default function HomeScreen() {
-  const { isDark } = useTheme();
-  const styles = getStyles(isDark);
-
-  return (
-    <View style={styles.container}>
-      <HomeHeader />
-      <View style={styles.separator} />
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Categories section will go here */}
-        <Text style={styles.categoriesTitle}>Categories</Text>
-      </ScrollView>
-    </View>
-  );
-}
 
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({
@@ -53,3 +35,23 @@ const getStyles = (isDark: boolean) =>
       color: isDark ? CommonColors.white : TextColors.primary,
     },
   });
+
+export default function HomeScreen() {
+  const { isDark } = useTheme();
+  const styles = getStyles(isDark);
+
+  return (
+    <View style={styles.container}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <HomeHeader />
+      <View style={styles.separator} />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Categories section will go here */}
+        <Text style={styles.categoriesTitle}>Categories</Text>
+      </ScrollView>
+    </View>
+  );
+}

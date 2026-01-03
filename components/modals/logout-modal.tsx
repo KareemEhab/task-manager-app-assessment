@@ -3,7 +3,7 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { CommonColors, DarkColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/button/button";
 
 type LogoutModalProps = {
   visible: boolean;

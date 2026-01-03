@@ -13,8 +13,8 @@ import {
 } from "react-native";
 
 import { BrandColors, LightColors, TextColors } from "@/constants/theme";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/common/button/button";
+import { Input } from "@/components/common/input/input";
 import { validateSignUp } from "@/utils/validation";
 
 export default function SignUpScreen() {

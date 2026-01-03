@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 
 import { BrandColors, TextColors } from "@/constants/theme";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/button/button";
 import { ImageSlider } from "@/components/ui/image-slider";
 
 // TODO: Replace with actual onboarding images

@@ -13,6 +13,48 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { NavButton } from "./nav-button";
 import { ToggleTheme } from "./toggle-theme";
 
+const getStyles = (isDark: boolean, bottomInset: number) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      borderTopWidth: 1,
+      borderTopColor: isDark ? DarkColors.darkBorder : LightColors.lightBorder,
+      paddingTop: 8,
+      paddingBottom: bottomInset,
+      position: "relative",
+      minHeight: 60,
+      backgroundColor: isDark ? DarkColors.darkText : CommonColors.white,
+    },
+    navButtons: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-around",
+    },
+    addButton: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: BrandColors.main,
+      alignItems: "center",
+      justifyContent: "center",
+      position: "absolute",
+      left: "50%",
+      marginLeft: -28,
+      top: -28,
+      shadowColor: BrandColors.main,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+  });
+
 export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
@@ -108,45 +150,3 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
     </View>
   );
 }
-
-const getStyles = (isDark: boolean, bottomInset: number) =>
-  StyleSheet.create({
-    container: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      justifyContent: "space-between",
-      borderTopWidth: 1,
-      borderTopColor: isDark ? DarkColors.darkBorder : LightColors.lightBorder,
-      paddingTop: 8,
-      paddingBottom: bottomInset,
-      position: "relative",
-      minHeight: 60,
-      backgroundColor: isDark ? DarkColors.darkText : CommonColors.white,
-    },
-    navButtons: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-around",
-    },
-    addButton: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: BrandColors.main,
-      alignItems: "center",
-      justifyContent: "center",
-      position: "absolute",
-      left: "50%",
-      marginLeft: -28,
-      top: -28,
-      shadowColor: BrandColors.main,
-      shadowOffset: {
-        width: 0,
-        height: 4,
-      },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      elevation: 8,
-    },
-  });
