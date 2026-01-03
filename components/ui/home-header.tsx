@@ -20,6 +20,18 @@ export function HomeHeader({ userName = "Krish Shah" }: HomeHeaderProps) {
   const { isDark } = useTheme();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(" ");
+    if (parts.length === 0) return "";
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (
+      parts[0].charAt(0).toUpperCase() +
+      parts[parts.length - 1].charAt(0).toUpperCase()
+    );
+  };
+
+  const initials = getInitials(userName);
+
   return (
     <>
       <View
@@ -30,12 +42,35 @@ export function HomeHeader({ userName = "Krish Shah" }: HomeHeaderProps) {
           },
         ]}
       >
+        <View style={styles.avatarContainer}>
+          <View
+            style={[
+              styles.avatar,
+              {
+                backgroundColor: isDark
+                  ? DarkColors.darkBorder
+                  : LightColors.light2,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.avatarText,
+                {
+                  color: isDark ? CommonColors.white : BrandColors.main,
+                },
+              ]}
+            >
+              {initials}
+            </Text>
+          </View>
+        </View>
         <View style={styles.welcomeSection}>
           <Text
             style={[
               styles.welcomeText,
               {
-                color: isDark ? DarkColors.dark4 : TextColors.secondary,
+                color: isDark ? CommonColors.white : TextColors.secondary,
               },
             ]}
           >
@@ -45,7 +80,7 @@ export function HomeHeader({ userName = "Krish Shah" }: HomeHeaderProps) {
             style={[
               styles.nameText,
               {
-                color: BrandColors.main,
+                color: isDark ? BrandColors.lighter : BrandColors.main,
               },
             ]}
           >
@@ -89,6 +124,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 16,
+  },
+  avatarContainer: {
+    marginRight: 12,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
   welcomeSection: {
     flex: 1,
