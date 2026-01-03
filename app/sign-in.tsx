@@ -14,28 +14,22 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { validateSignUp } from "@/utils/validation";
+import { validateLogin } from "@/utils/validation";
 
-export default function SignUpScreen() {
-  const [name, setName] = useState("");
+export default function SignInScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({
-    name: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
-  const handleSignUp = () => {
+  const handleSignIn = () => {
     Keyboard.dismiss();
 
-    const validationErrors = validateSignUp({
-      name,
+    const validationErrors = validateLogin({
       email,
       password,
-      confirmPassword,
     });
 
     setErrors(validationErrors);
@@ -45,8 +39,8 @@ export default function SignUpScreen() {
       return;
     }
 
-    // Handle sign up logic here
-    console.log("Sign up:", { name, email, password });
+    // Handle sign in logic here
+    console.log("Sign in:", { email, password });
   };
 
   return (
@@ -64,25 +58,12 @@ export default function SignUpScreen() {
         keyboardDismissMode="on-drag"
       >
         <View style={styles.formContainer}>
-          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.title}>Login</Text>
           <Text style={styles.subtitle}>
-            Fill in your details to get started
+            Welcome back — log in to manage your tasks effortlessly.
           </Text>
 
           <View style={styles.inputsContainer}>
-            <Input
-              label="Name"
-              placeholder="Enter your name"
-              value={name}
-              onChangeText={(text) => {
-                setName(text);
-                if (errors.name) {
-                  setErrors({ ...errors, name: "" });
-                }
-              }}
-              type="text"
-              error={errors.name}
-            />
             <Input
               label="Email"
               placeholder="Enter your email"
@@ -109,26 +90,13 @@ export default function SignUpScreen() {
               type="password"
               error={errors.password}
             />
-            <Input
-              label="Confirm Password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChangeText={(text) => {
-                setConfirmPassword(text);
-                if (errors.confirmPassword) {
-                  setErrors({ ...errors, confirmPassword: "" });
-                }
-              }}
-              type="password"
-              error={errors.confirmPassword}
-            />
           </View>
 
           <View style={styles.buttonsContainer}>
             <Button
               variant="primary"
-              title="Sign Up"
-              onPress={handleSignUp}
+              title="Login"
+              onPress={handleSignIn}
               style={styles.button}
             />
             <Button
@@ -140,12 +108,12 @@ export default function SignUpScreen() {
           </View>
 
           <View style={styles.accountContainer}>
-            <Text style={styles.accountText}>Already have an account? </Text>
+            <Text style={styles.accountText}>Don't have an account? </Text>
             <TouchableOpacity
-              onPress={() => router.push("/sign-in")}
+              onPress={() => router.push("/sign-up")}
               activeOpacity={0.7}
             >
-              <Text style={styles.signInLink}>Sign In</Text>
+              <Text style={styles.signUpLink}>Sign up</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -204,7 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6B7280",
   },
-  signInLink: {
+  signUpLink: {
     fontSize: 14,
     color: "#3377FF",
     fontWeight: "600",

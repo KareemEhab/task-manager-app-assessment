@@ -15,8 +15,7 @@ const onboardingImages = [
 
 export default function OnboardingScreen() {
   const handleSignIn = () => {
-    // Navigate to sign in screen
-    console.log("Sign In pressed");
+    router.push("/sign-in");
   };
 
   const handleSignUp = () => {
