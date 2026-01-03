@@ -39,8 +39,8 @@ export default function SignInScreen() {
       return;
     }
 
-    // Handle sign in logic here
-    console.log("Sign in:", { email, password });
+    // Navigate to home screen on successful sign in
+    router.replace("/(tabs)");
   };
 
   return (
