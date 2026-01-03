@@ -20,6 +20,7 @@ export const DarkColors = {
   dark4: "#C7C9D9",
   darkText: "#1F2937",
   darkBorder: "#374151",
+  darkBackground: "#111827",
 };
 
 // Light Colors

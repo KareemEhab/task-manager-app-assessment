@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 
 import { CategoriesHome } from "@/components/ui/categories-home";
 import { HomeHeader } from "@/components/ui/home-header";
+import { TasksHome } from "@/components/ui/tasks-home";
 import { DarkColors, LightColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
 import { categories } from "@/data/categories";
@@ -11,7 +12,7 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? DarkColors.dark1 : LightColors.light4,
+      backgroundColor: isDark ? DarkColors.darkBackground : LightColors.light4,
     },
     scrollView: {
       flex: 1,
@@ -41,6 +42,7 @@ export default function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <CategoriesHome categories={categories} />
+        <TasksHome />
       </ScrollView>
     </View>
   );
