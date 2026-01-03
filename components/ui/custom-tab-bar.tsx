@@ -1,5 +1,4 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { router } from "expo-router";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -17,14 +16,11 @@ import { ToggleTheme } from "./toggle-theme";
 export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const styles = getStyles(isDark, insets.bottom);
 
   const handleAddPress = () => {
     // Handle add task action
     console.log("Add task pressed");
-  };
-
-  const getRouteIndex = (routeName: string) => {
-    return state.routes.findIndex((r) => r.name === routeName);
   };
 
   const isRouteFocused = (routeName: string) => {
@@ -34,23 +30,13 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
   const handleTabPress = (routeName: string) => {
     const route = state.routes.find((r) => r.name === routeName);
     if (route) {
-      router.push(`/(tabs)/${routeName}` as any);
+      const { navigation } = descriptors[route.key];
+      navigation.navigate(route.name);
     }
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: isDark ? DarkColors.darkText : CommonColors.white,
-          borderTopColor: isDark
-            ? DarkColors.darkBorder
-            : LightColors.lightBorder,
-          paddingBottom: insets.bottom,
-        },
-      ]}
-    >
+    <View style={styles.container}>
       <View style={styles.navButtons}>
         <NavButton
           icon={
@@ -123,40 +109,44 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    borderTopWidth: 1,
-    paddingTop: 8,
-    position: "relative",
-    minHeight: 60,
-  },
-  navButtons: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  addButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: BrandColors.main,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    left: "50%",
-    marginLeft: -28,
-    top: -28,
-    shadowColor: BrandColors.main,
-    shadowOffset: {
-      width: 0,
-      height: 4,
+const getStyles = (isDark: boolean, bottomInset: number) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      borderTopWidth: 1,
+      borderTopColor: isDark ? DarkColors.darkBorder : LightColors.lightBorder,
+      paddingTop: 8,
+      paddingBottom: bottomInset,
+      position: "relative",
+      minHeight: 60,
+      backgroundColor: isDark ? DarkColors.darkText : CommonColors.white,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-});
+    navButtons: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-around",
+    },
+    addButton: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: BrandColors.main,
+      alignItems: "center",
+      justifyContent: "center",
+      position: "absolute",
+      left: "50%",
+      marginLeft: -28,
+      top: -28,
+      shadowColor: BrandColors.main,
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+  });
