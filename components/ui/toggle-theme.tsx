@@ -43,10 +43,8 @@ export function ToggleTheme({ isSelected }: ToggleThemeProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 8,
   },
   label: {
     fontSize: 12,

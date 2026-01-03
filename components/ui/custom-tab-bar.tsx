@@ -11,7 +11,6 @@ import {
 import { useTheme } from "@/contexts/theme-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { NavButton } from "./nav-button";
-import { ToggleTheme } from "./toggle-theme";
 
 const getStyles = (isDark: boolean, bottomInset: number) =>
   StyleSheet.create({
@@ -31,7 +30,7 @@ const getStyles = (isDark: boolean, bottomInset: number) =>
       flex: 1,
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-around",
+      justifyContent: "center",
     },
     addButton: {
       width: 56,
@@ -98,6 +97,17 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
           isSelected={isRouteFocused("index")}
           onPress={() => handleTabPress("index")}
         />
+      </View>
+
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={handleAddPress}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="add" size={32} color={CommonColors.white} />
+      </TouchableOpacity>
+
+      <View style={styles.navButtons}>
         <NavButton
           icon={
             <Ionicons
@@ -116,36 +126,6 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
           isSelected={isRouteFocused("calendar")}
           onPress={() => handleTabPress("calendar")}
         />
-      </View>
-
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={handleAddPress}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="add" size={32} color={CommonColors.white} />
-      </TouchableOpacity>
-
-      <View style={styles.navButtons}>
-        <NavButton
-          icon={
-            <Ionicons
-              name="chatbubble-outline"
-              size={24}
-              color={
-                isRouteFocused("chat")
-                  ? isDark
-                    ? BrandColors.lighter
-                    : BrandColors.main
-                  : DarkColors.dark3
-              }
-            />
-          }
-          label="Chat"
-          isSelected={isRouteFocused("chat")}
-          onPress={() => handleTabPress("chat")}
-        />
-        <ToggleTheme isSelected={false} />
       </View>
     </View>
   );

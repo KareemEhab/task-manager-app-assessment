@@ -17,7 +17,7 @@ type HomeHeaderProps = {
 };
 
 export function HomeHeader({ userName = "Krish Shah" }: HomeHeaderProps) {
-  const { isDark } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const getInitials = (name: string) => {
@@ -88,24 +88,44 @@ export function HomeHeader({ userName = "Krish Shah" }: HomeHeaderProps) {
           </Text>
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.logoutButton,
-            {
-              backgroundColor: isDark
-                ? DarkColors.darkBorder
-                : LightColors.light2,
-            },
-          ]}
-          onPress={() => setShowLogoutModal(true)}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name="log-out-outline"
-            size={20}
-            color={isDark ? CommonColors.white : TextColors.primary}
-          />
-        </TouchableOpacity>
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity
+            style={[
+              styles.themeToggleButton,
+              {
+                backgroundColor: isDark
+                  ? DarkColors.darkBorder
+                  : LightColors.light2,
+              },
+            ]}
+            onPress={toggleTheme}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={isDark ? "sunny-outline" : "moon-outline"}
+              size={20}
+              color={isDark ? CommonColors.white : TextColors.primary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.logoutButton,
+              {
+                backgroundColor: isDark
+                  ? DarkColors.darkBorder
+                  : LightColors.light2,
+              },
+            ]}
+            onPress={() => setShowLogoutModal(true)}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name="log-out-outline"
+              size={20}
+              color={isDark ? CommonColors.white : TextColors.primary}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <LogoutModal
@@ -150,6 +170,18 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: 24,
     fontWeight: "500",
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  themeToggleButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoutButton: {
     width: 40,
