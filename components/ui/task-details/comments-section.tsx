@@ -47,12 +47,15 @@ export function CommentsSection({
                 <Text style={styles.commentAuthor}>{comment.name}</Text>
                 <Text style={styles.commentText}>{comment.comment}</Text>
                 <Text style={styles.commentTime}>
-                  {formatDate(new Date())} at{" "}
-                  {new Date().toLocaleTimeString("en-US", {
-                    hour: "numeric",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
+                  {comment.createdAt
+                    ? formatDate(comment.createdAt) +
+                      " at " +
+                      comment.createdAt.toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      })
+                    : "Just now"}
                 </Text>
               </View>
               <TouchableOpacity

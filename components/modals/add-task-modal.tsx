@@ -13,7 +13,8 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { addTask } from "@/data/task-manager";
+import { Task } from "@/data/tasks";
+import { useTasks } from "@/hooks/useTasks";
 import {
   TaskFormData,
   TaskFormErrors,
@@ -41,15 +42,27 @@ export function AddTaskModal({
     priority: "low",
     status: "upcoming",
     categories: [],
+    assignedTo: "",
   });
   const [errors, setErrors] = useState<TaskFormErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
+
+  const { createTask } = useTasks({
+    onTaskUpdate: () => {},
+    onTaskDelete: () => {},
+    onSuccess: () => {
+      handleClose();
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+        onTaskAdded();
+      }, 2000);
+    },
+  });
 
   const styles = getStyles(isDark);
 
   const handleClose = () => {
-    if (isLoading) return;
     setFormData({
       title: "",
       description: "",
@@ -57,6 +70,7 @@ export function AddTaskModal({
       priority: "low",
       status: "upcoming",
       categories: [],
+      assignedTo: "",
     });
     setErrors({});
     onClose();
@@ -75,38 +89,22 @@ export function AddTaskModal({
       return;
     }
 
-    setIsLoading(true);
+    const newTask: Task = {
+      id: "", // Will be set by backend
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      priority: formData.priority,
+      status: formData.status,
+      dueDate: formData.dueDate!,
+      categories: formData.categories,
+      assignedTo: formData.assignedTo?.trim() || undefined,
+      createdBy: "You", // Will be set by backend
+      createdOn: new Date(),
+      lastUpdated: new Date(),
+      comments: [],
+    };
 
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const newTask = {
-        id: Date.now().toString(),
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        priority: formData.priority,
-        status: formData.status,
-        dueDate: formData.dueDate!,
-        categories: formData.categories,
-        createdBy: "You",
-        createdOn: new Date(),
-        lastUpdated: new Date(),
-        comments: [],
-        done: false,
-      };
-
-      addTask(newTask);
-      setIsLoading(false);
-      handleClose();
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-        onTaskAdded();
-      }, 2000);
-    } catch (error) {
-      setIsLoading(false);
-      console.error("Failed to create task:", error);
-    }
+    await createTask(newTask);
   };
 
   return (
@@ -134,15 +132,12 @@ export function AddTaskModal({
                 title="Cancel"
                 onPress={handleClose}
                 style={styles.cancelButton}
-                disabled={isLoading}
               />
               <Button
                 variant="primary"
                 title="Create Task"
                 onPress={handleSubmit}
                 style={styles.createButton}
-                loading={isLoading}
-                disabled={isLoading}
               />
             </View>
           </View>

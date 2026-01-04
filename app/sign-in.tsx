@@ -18,6 +18,7 @@ import { Button } from "@/components/common/button/button";
 import { Input } from "@/components/common/input/input";
 import { BrandColors, LightColors, TextColors } from "@/constants/theme";
 import { validateLogin } from "@/utils/validation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SignInScreen() {
   const [email, setEmail] = useState("");
@@ -26,8 +27,9 @@ export default function SignInScreen() {
     email: "",
     password: "",
   });
+  const { signIn, isLoading, error: authError } = useAuth();
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     Keyboard.dismiss();
 
     const validationErrors = validateLogin({
@@ -42,8 +44,16 @@ export default function SignInScreen() {
       return;
     }
 
-    // Navigate to home screen on successful sign in
-    router.replace("/(tabs)");
+    // Call sign-in API
+    const result = await signIn(email, password);
+    
+    if (!result.success) {
+      // Set error message if sign-in failed
+      setErrors({
+        email: result.error || "",
+        password: result.error || "",
+      });
+    }
   };
 
   return (
@@ -110,9 +120,10 @@ export default function SignInScreen() {
             <View style={styles.buttonsContainer}>
               <Button
                 variant="primary"
-                title="Login"
+                title={isLoading ? "Logging in..." : "Login"}
                 onPress={handleSignIn}
                 style={styles.button}
+                disabled={isLoading}
               />
             </View>
 

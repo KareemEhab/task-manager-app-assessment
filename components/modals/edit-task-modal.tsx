@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BottomDrawer } from "@/components/common/bottom-drawer/bottom-drawer";
 import { Button } from "@/components/common/button/button";
+import { Toast } from "@/components/common/toast";
 import { DeleteTaskModal } from "@/components/modals/delete-task-modal";
 import {
   CommonColors,
@@ -13,11 +14,8 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import {
-  deleteTask as deleteTaskFromData,
-  updateTask,
-} from "@/data/task-manager";
 import { Task } from "@/data/tasks";
+import { useTasks } from "@/hooks/useTasks";
 import {
   TaskFormData,
   TaskFormErrors,
@@ -49,11 +47,38 @@ export function EditTaskModal({
     priority: "low",
     status: "upcoming",
     categories: [],
+    assignedTo: "",
   });
   const [errors, setErrors] = useState<TaskFormErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const {
+    updateTask,
+    deleteTask,
+    isDeleting,
+    isMarkingDone,
+    showToast,
+    toastMessage,
+    setShowToast,
+  } = useTasks({
+    onTaskUpdate: () => {
+      handleClose();
+      onTaskUpdated();
+    },
+    onTaskDelete: () => {
+      // Only close modal if deletion was successful (no error thrown)
+      setShowDeleteModal(false);
+      // Delay closing the modal to allow toast to be visible
+      // Toast is set in the deleteTask hook, so we wait for it to show
+      setTimeout(() => {
+        handleClose();
+        onTaskDeleted();
+      }, 1500); // Give enough time for toast to be visible
+    },
+    onSuccess: () => {},
+  });
+
+  const isLoading = isMarkingDone;
 
   const styles = getStyles(isDark);
 
@@ -66,13 +91,13 @@ export function EditTaskModal({
         priority: task.priority,
         status: task.status,
         categories: task.categories,
+        assignedTo: task.assignedTo || "",
       });
       setErrors({});
     }
   }, [task, visible]);
 
   const handleClose = () => {
-    if (isLoading) return;
     setErrors({});
     onClose();
   };
@@ -92,28 +117,15 @@ export function EditTaskModal({
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      updateTask(task.id, {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        priority: formData.priority,
-        status: formData.status,
-        dueDate: formData.dueDate!,
-        categories: formData.categories,
-        lastUpdated: new Date(),
-      });
-
-      setIsLoading(false);
-      handleClose();
-      onTaskUpdated();
-    } catch (error) {
-      setIsLoading(false);
-      console.error("Failed to update task:", error);
-    }
+    await updateTask(task.id, {
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      priority: formData.priority,
+      status: formData.status,
+      dueDate: formData.dueDate!,
+      categories: formData.categories,
+      assignedTo: formData.assignedTo?.trim() || undefined,
+    });
   };
 
   const handleDelete = () => {
@@ -122,17 +134,18 @@ export function EditTaskModal({
 
   const handleDeleteConfirm = async () => {
     if (!task) return;
-    setIsDeleting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      deleteTaskFromData(task.id);
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-      handleClose();
-      onTaskDeleted();
-    } catch (error) {
-      setIsDeleting(false);
-      console.error("Failed to delete task:", error);
+      // Delete the task (this sets loading state and toast message)
+      // Use task.id directly - it should be the MongoDB _id from the backend
+      await deleteTask(task.id);
+      // Modal will be closed by onTaskDelete callback if deletion succeeds
+      // No need to handle success here - onTaskDelete callback handles it
+    } catch (error: any) {
+      // Error handling is done in deleteTask hook
+      // The toast will be shown by the deleteTask hook
+      // Don't show error here - let the hook handle it silently
+      // Modal stays open if deletion fails so user can try again
+      console.error("Delete failed in EditTaskModal:", error);
     }
   };
 
@@ -199,6 +212,12 @@ export function EditTaskModal({
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
+      />
+
+      <Toast
+        visible={showToast}
+        message={toastMessage}
+        onHide={() => setShowToast(false)}
       />
     </>
   );

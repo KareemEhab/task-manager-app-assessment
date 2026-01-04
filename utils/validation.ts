@@ -35,6 +35,8 @@ export function validateSignUp(data: SignUpFormData): ValidationErrors {
     errors.name = "Name is required";
   } else if (data.name.trim().length < 2) {
     errors.name = "Name must be at least 2 characters";
+  } else if (data.name.trim().length > 20) {
+    errors.name = "Name must be at most 20 characters";
   }
 
   // Validate email

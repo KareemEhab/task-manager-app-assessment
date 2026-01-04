@@ -3,8 +3,10 @@ export type TaskStatus = "upcoming" | "in-progress" | "in-review" | "completed";
 export type TaskPriority = "low" | "medium" | "high";
 
 export type TaskComment = {
+  _id?: string;
   name: string;
   comment: string;
+  createdAt?: Date;
 };
 
 export type Task = {
@@ -15,6 +17,7 @@ export type Task = {
   status: TaskStatus;
   dueDate?: Date;
   categories: string[];
+  assignedTo?: string;
   createdBy: string;
   createdOn: Date;
   lastUpdated: Date;

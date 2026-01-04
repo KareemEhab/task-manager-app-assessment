@@ -1,11 +1,11 @@
 import { useState } from "react";
 
 import { Task, TaskComment } from "@/data/tasks";
+import { commentsAPI, tasksAPI } from "@/services/api";
 import {
-  addTask,
-  deleteTask as deleteTaskFromData,
-  updateTask as updateTaskInData,
-} from "@/data/task-manager";
+  transformBackendTask,
+  transformFrontendTask,
+} from "@/utils/task-transform";
 
 type UseTasksOptions = {
   onTaskUpdate: (taskId: string, updates: Partial<Task>) => void;
@@ -22,19 +22,22 @@ export function useTasks({
   const [toastMessage, setToastMessage] = useState("");
   const [isMarkingDone, setIsMarkingDone] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
+    null
+  );
 
   const markTaskAsDone = async (task: Task) => {
     setIsMarkingDone(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await api.markTaskAsDone(task.id);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      onTaskUpdate(task.id, {
-        done: true,
+      const updatedTask = await tasksAPI.update(task.id, {
         status: "completed",
-        lastUpdated: new Date(),
+      });
+
+      const transformedTask = transformBackendTask(updatedTask);
+      onTaskUpdate(task.id, {
+        status: "completed",
+        lastUpdated: transformedTask.lastUpdated,
       });
 
       setIsMarkingDone(false);
@@ -43,9 +46,12 @@ export function useTasks({
       setTimeout(() => {
         setShowToast(false);
       }, 2000);
-    } catch (error) {
+    } catch (error: any) {
       setIsMarkingDone(false);
-      setToastMessage("Failed to mark task as done");
+      const errorMessage =
+        error.response?.data || error.message || "Failed to mark task as done";
+      console.error("Error marking task as done:", errorMessage, error);
+      setToastMessage(errorMessage);
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
@@ -57,35 +63,46 @@ export function useTasks({
     setIsDeleting(true);
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await api.deleteTask(taskId);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      deleteTaskFromData(taskId);
-      onTaskDelete(taskId);
+      await tasksAPI.delete(taskId);
+      // Only call onTaskDelete if deletion was successful
       setIsDeleting(false);
+      // Set toast message BEFORE calling callback so it's visible
       setToastMessage("Task was successfully deleted");
-      // Toast will be shown by the caller after navigation
-    } catch (error) {
+      setShowToast(true);
+      // Call callback after toast is set
+      onTaskDelete(taskId);
+      // Toast will be shown by the caller, but also show it here as fallback
+    } catch (error: any) {
       setIsDeleting(false);
-      setToastMessage("Failed to delete task");
+      // Don't call onTaskDelete if deletion failed
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message ||
+        "Failed to delete task";
+      console.error("Error deleting task:", errorMessage, error);
+      setToastMessage(errorMessage);
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
       }, 2000);
+      // Re-throw error so caller can handle it
+      throw error;
     }
   };
 
   const createTask = async (task: Task) => {
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      addTask(task);
+      const taskData = transformFrontendTask(task);
+      await tasksAPI.create(taskData);
       setToastMessage("Task was created successfully");
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
       }, 2000);
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       setToastMessage("Failed to create task");
       setShowToast(true);
@@ -97,10 +114,13 @@ export function useTasks({
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
     try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      updateTaskInData(taskId, updates);
-      onTaskUpdate(taskId, updates);
+      const updateData = transformFrontendTask(updates);
+      const updatedTask = await tasksAPI.update(taskId, updateData);
+      const transformedTask = transformBackendTask(updatedTask);
+      onTaskUpdate(taskId, {
+        ...updates,
+        lastUpdated: transformedTask.lastUpdated,
+      });
       setToastMessage("Task was updated successfully");
       setShowToast(true);
       setTimeout(() => {
@@ -122,22 +142,17 @@ export function useTasks({
   ) => {
     if (!comment.trim()) return;
 
-    const newComment: TaskComment = {
-      name: "You", // TODO: Get from auth context
-      comment: comment.trim(),
-    };
-
     try {
-      // TODO: Replace with actual API call
-      // const response = await api.addComment(taskId, newComment);
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      const updatedTask = await commentsAPI.add(taskId, comment);
+      const transformedTask = transformBackendTask(updatedTask);
 
       onTaskUpdate(taskId, {
-        comments: [...currentComments, newComment],
-        lastUpdated: new Date(),
+        comments: transformedTask.comments,
+        lastUpdated: transformedTask.lastUpdated,
       });
     } catch (error) {
       console.error("Failed to add comment:", error);
+      throw error;
     }
   };
 
@@ -147,19 +162,33 @@ export function useTasks({
     currentComments: TaskComment[]
   ) => {
     try {
-      // TODO: Replace with actual API call
-      // const response = await api.deleteComment(taskId, commentIndex);
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      // Get the comment ID from the current comments
+      const commentToDelete = currentComments[commentIndex];
+      if (!commentToDelete || !(commentToDelete as any)._id) {
+        throw new Error("Comment not found");
+      }
 
-      const updatedComments = currentComments.filter(
-        (_, i) => i !== commentIndex
-      );
+      const commentId = (commentToDelete as any)._id;
+
+      // Prevent double calls by checking if this specific comment is already being deleted
+      if (deletingCommentId === commentId) {
+        console.warn("Comment deletion already in progress for this comment");
+        return;
+      }
+
+      setDeletingCommentId(commentId); // Track which comment is being deleted
+      const updatedTask = await commentsAPI.delete(taskId, commentId);
+      const transformedTask = transformBackendTask(updatedTask);
+
       onTaskUpdate(taskId, {
-        comments: updatedComments,
-        lastUpdated: new Date(),
+        comments: transformedTask.comments,
+        lastUpdated: transformedTask.lastUpdated,
       });
+      setDeletingCommentId(null); // Clear tracking
     } catch (error) {
+      setDeletingCommentId(null); // Clear tracking on error
       console.error("Failed to delete comment:", error);
+      throw error;
     }
   };
 
@@ -178,4 +207,3 @@ export function useTasks({
     updateTask,
   };
 }
-

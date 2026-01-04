@@ -62,6 +62,13 @@ export function CategoriesInput({
           onChangeText={setInputValue}
           onSubmitEditing={handleAddCategory}
           onKeyPress={handleKeyPress}
+          autoComplete="off"
+          autoCorrect={false}
+          spellCheck={false}
+          importantForAutofill="no"
+          textContentType="none"
+          editable={true}
+          autoFocus={false}
         />
         <TouchableOpacity
           style={styles.addButton}

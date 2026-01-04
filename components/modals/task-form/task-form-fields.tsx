@@ -58,6 +58,16 @@ export function TaskFormFields({
         minimumDate={minimumDate}
       />
 
+      <Input
+        label="Assign To (Optional)"
+        placeholder="Enter email address"
+        value={formData.assignedTo || ""}
+        onChangeText={(text) => onFieldChange("assignedTo", text)}
+        error={errors.assignedTo}
+        type="text"
+        keyboardType="email-address"
+      />
+
       <CategoriesInput
         label="Categories"
         categories={formData.categories}

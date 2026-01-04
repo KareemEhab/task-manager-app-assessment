@@ -1,5 +1,10 @@
 import { TaskPriority, TaskStatus } from "@/data/tasks";
 
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 export type TaskFormData = {
   title: string;
   description: string;
@@ -7,6 +12,7 @@ export type TaskFormData = {
   priority: TaskPriority;
   status: TaskStatus;
   categories: string[];
+  assignedTo?: string;
 };
 
 export type TaskFormErrors = {
@@ -16,6 +22,7 @@ export type TaskFormErrors = {
   priority?: string;
   status?: string;
   categories?: string;
+  assignedTo?: string;
 };
 
 export function validateTaskForm(data: TaskFormData): TaskFormErrors {
@@ -61,6 +68,13 @@ export function validateTaskForm(data: TaskFormData): TaskFormErrors {
   // Categories: at least one required
   if (!data.categories || data.categories.length === 0) {
     errors.categories = "At least one category is required";
+  }
+
+  // Assigned To: optional, but if provided must be valid email
+  if (data.assignedTo && data.assignedTo.trim().length > 0) {
+    if (!isValidEmail(data.assignedTo.trim())) {
+      errors.assignedTo = "Please enter a valid email address";
+    }
   }
 
   return errors;

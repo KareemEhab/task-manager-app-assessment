@@ -23,7 +23,9 @@ export function TasksHome({ tasks, onTaskPress }: TasksHomeProps) {
   const styles = getStyles(isDark);
 
   const filteredTasks = tasks.filter((task) =>
-    activeTab === "active" ? !task.done : task.done
+    activeTab === "active" 
+      ? task.status !== "completed" 
+      : task.status === "completed"
   );
 
   return (

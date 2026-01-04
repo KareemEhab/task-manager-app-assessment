@@ -4,6 +4,7 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { CommonColors, DarkColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
 import { Button } from "@/components/common/button/button";
+import { useAuth } from "@/hooks/useAuth";
 
 type LogoutModalProps = {
   visible: boolean;
@@ -12,12 +13,11 @@ type LogoutModalProps = {
 
 export function LogoutModal({ visible, onClose }: LogoutModalProps) {
   const { isDark } = useTheme();
+  const { signOut } = useAuth();
 
-  const handleLogout = () => {
-    // Handle logout logic here
-    console.log("User logged out");
+  const handleLogout = async () => {
+    await signOut();
     onClose();
-    // Navigate to sign-in screen or clear auth state
   };
 
   return (

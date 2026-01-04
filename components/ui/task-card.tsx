@@ -98,7 +98,7 @@ export function TaskCard({ task, onPress }: TaskCardProps) {
       <View style={styles.separator} />
 
       <View style={styles.footer}>
-        {task.done ? (
+        {task.status === "completed" ? (
           <View style={styles.completedContainer}>
             <Text style={styles.completedText}>Completed</Text>
             <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />

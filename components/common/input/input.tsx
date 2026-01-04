@@ -28,6 +28,9 @@ export function Input({
   themeMode = "auto",
   value,
   onChangeText,
+  textContentType,
+  autoComplete,
+  autoFocus,
   ...props
 }: InputProps) {
   const { isDark: appIsDark } = useTheme();
@@ -55,6 +58,7 @@ export function Input({
       </Text>
       <View style={inputStyles.inputContainer}>
         <TextInput
+          editable={props.editable !== false}
           {...props}
           style={[
             inputStyles.input,
@@ -84,10 +88,16 @@ export function Input({
           onChangeText={onChangeText}
           secureTextEntry={isPassword && !isPasswordVisible}
           autoCapitalize={type === "email" ? "none" : "sentences"}
-          keyboardType={type === "email" ? "email-address" : "default"}
+          keyboardType={type === "email" ? "email-address" : props.keyboardType || "default"}
           multiline={isTextarea}
           numberOfLines={isTextarea ? 4 : undefined}
           textAlignVertical={isTextarea ? "top" : "center"}
+          autoComplete={autoComplete || "off"}
+          autoCorrect={false}
+          spellCheck={false}
+          importantForAutofill="no"
+          textContentType={textContentType || "none"}
+          autoFocus={autoFocus || false}
         />
         {isPassword && (
           <TouchableOpacity

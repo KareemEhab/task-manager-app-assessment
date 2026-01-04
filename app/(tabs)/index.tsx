@@ -1,14 +1,14 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@/components/common/button/button";
 import { Toast } from "@/components/common/toast";
 import { CategoriesHome } from "@/components/ui/categories-home";
 import { HomeHeader } from "@/components/ui/home-header";
 import { TasksHome } from "@/components/ui/tasks-home";
+import { AddTaskModal } from "@/components/modals/add-task-modal";
 import {
   CommonColors,
   DarkColors,
@@ -16,8 +16,9 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { categories } from "@/data/categories";
-import { getAllTasks } from "@/data/task-manager";
+import { useCategories } from "@/hooks/useCategories";
+import { useFetchTasks } from "@/hooks/useFetchTasks";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Task } from "@/data/tasks";
 
 const getStyles = (isDark: boolean) =>
@@ -60,51 +61,34 @@ const getStyles = (isDark: boolean) =>
 export default function HomeScreen() {
   const { isDark } = useTheme();
   const styles = getStyles(isDark);
-  const [allTasks, setAllTasks] = useState<Task[]>(getAllTasks());
+  const { tasks: allTasks, isLoading: tasksLoading, refetch: refetchTasks } = useFetchTasks();
+  const { categories, isLoading: categoriesLoading, refetch: refetchCategories } = useCategories();
+  const { user, isLoading: userLoading, refetch: refetchUser } = useCurrentUser();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
   const params = useLocalSearchParams<{ deletedTaskId?: string }>();
 
   // Check if there are no tasks
-  const hasNoData = allTasks.length === 0;
+  const hasNoData = !tasksLoading && allTasks.length === 0;
+  const isLoading = tasksLoading || categoriesLoading || userLoading;
 
-  // Handle task deletion from AsyncStorage when screen focuses
+  // Refresh data when screen focuses
   useFocusEffect(
     useCallback(() => {
-      const checkDeletedTask = async () => {
-        try {
-          const deletedTaskId = await AsyncStorage.getItem("deletedTaskId");
-          if (deletedTaskId) {
-            // Refresh tasks from task manager
-            setAllTasks(getAllTasks());
-
-            // Show toast
-            setToastMessage("Task was successfully deleted");
-            setShowToast(true);
-
-            // Clear AsyncStorage
-            await AsyncStorage.removeItem("deletedTaskId");
-
-            // Hide toast after 2 seconds
-            setTimeout(() => {
-              setShowToast(false);
-            }, 2000);
-          } else {
-            // Refresh tasks on focus
-            setAllTasks(getAllTasks());
-          }
-        } catch (error) {
-          console.log("Error checking deleted task:", error);
-        }
-      };
-
-      checkDeletedTask();
-    }, [])
+      refetchTasks();
+      refetchCategories();
+      refetchUser();
+    }, [refetchTasks, refetchCategories, refetchUser])
   );
 
   const handleCreateTask = () => {
-    // Handle create task action (to be implemented)
-    console.log("Create task pressed");
+    setShowAddTaskModal(true);
+  };
+
+  const handleTaskAdded = () => {
+    refetchTasks();
+    refetchCategories();
   };
 
   const handleTaskPress = (task: Task) => {
@@ -114,9 +98,13 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style={isDark ? "light" : "dark"} />
-      <HomeHeader />
+      <HomeHeader userName={user?.name || "User"} />
       <View style={styles.separator} />
-      {hasNoData ? (
+      {isLoading ? (
+        <View style={styles.emptyStateContainer}>
+          <ActivityIndicator size="large" color={isDark ? CommonColors.white : TextColors.primary} />
+        </View>
+      ) : hasNoData ? (
         <View style={styles.emptyStateContainer}>
           <Text
             style={[
@@ -148,6 +136,11 @@ export default function HomeScreen() {
         visible={showToast}
         message={toastMessage}
         onHide={() => setShowToast(false)}
+      />
+      <AddTaskModal
+        visible={showAddTaskModal}
+        onClose={() => setShowAddTaskModal(false)}
+        onTaskAdded={handleTaskAdded}
       />
     </View>
   );

@@ -1,5 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
@@ -27,9 +26,10 @@ import { DetailsSection } from "@/components/ui/task-details/details-section";
 import { getTaskDetailsStyles } from "@/components/ui/task-details/task-details.styles";
 import { CommonColors, DarkColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { getTaskById } from "@/data/task-manager";
 import { Task, TaskComment } from "@/data/tasks";
 import { useTasks } from "@/hooks/useTasks";
+import { tasksAPI } from "@/services/api";
+import { transformBackendTask } from "@/utils/task-transform";
 
 export default function TaskDetailsScreen() {
   const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
@@ -45,6 +45,7 @@ export default function TaskDetailsScreen() {
   >(null);
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<TaskComment[]>([]);
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
 
   const {
     showToast,
@@ -75,15 +76,21 @@ export default function TaskDetailsScreen() {
 
   // Load task on mount
   useEffect(() => {
-    if (id) {
-      const foundTask = getTaskById(id);
-      if (foundTask) {
-        setTask(foundTask);
-        setComments(foundTask.comments || []);
-      } else {
-        router.back();
+    const fetchTask = async () => {
+      if (id) {
+        try {
+          const backendTask = await tasksAPI.getById(id);
+          const transformedTask = transformBackendTask(backendTask);
+          setTask(transformedTask);
+          setComments(transformedTask.comments || []);
+        } catch (error) {
+          console.error("Error fetching task:", error);
+          router.back();
+        }
       }
-    }
+    };
+
+    fetchTask();
   }, [id]);
 
   // Reset expansion states when task changes
@@ -94,7 +101,13 @@ export default function TaskDetailsScreen() {
   }, [id]);
 
   if (!task) {
-    return null;
+    return (
+      <SafeAreaView style={getTaskDetailsStyles(isDark).container} edges={["top"]}>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator size="large" color={isDark ? CommonColors.white : TextColors.primary} />
+        </View>
+      </SafeAreaView>
+    );
   }
 
   const handleMarkAsDone = () => {
@@ -102,25 +115,40 @@ export default function TaskDetailsScreen() {
   };
 
   const handleDelete = async () => {
-    // Delete the task (this sets loading state and toast message)
-    await deleteTask(task.id);
+    try {
+      // Delete the task (this sets loading state and toast message)
+      await deleteTask(task.id);
 
-    // Close modal after deletion completes
-    setShowDeleteModal(false);
+      // Close modal after deletion completes
+      setShowDeleteModal(false);
 
-    // Store deleted task ID in AsyncStorage for home screen to pick up
-    await AsyncStorage.setItem("deletedTaskId", task.id);
-
-    // Navigate back to home screen
-    router.back();
+      // Show toast before navigation
+      setShowToast(true);
+      setToastMessage("Task was successfully deleted");
+      
+      // Navigate back to home screen after a short delay
+      setTimeout(() => {
+        router.back();
+      }, 500);
+    } catch (error: any) {
+      // Error handling is done in deleteTask hook
+      // Keep modal open so user can see the error or try again
+      // The toast will be shown by the deleteTask hook
+      console.error("Delete failed:", error);
+    }
   };
 
   const handleAddComment = async () => {
     if (!commentText.trim()) return;
     Keyboard.dismiss();
-    await addComment(task.id, commentText, comments);
-    setComments([...comments, { name: "You", comment: commentText.trim() }]);
-    setCommentText("");
+    try {
+      await addComment(task.id, commentText, comments);
+      // Comments will be updated via onTaskUpdate callback
+      setCommentText("");
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+      // Show error toast if needed
+    }
   };
 
   const handleDeleteCommentClick = (index: number) => {
@@ -129,11 +157,23 @@ export default function TaskDetailsScreen() {
   };
 
   const handleDeleteCommentConfirm = async () => {
-    if (commentToDeleteIndex !== null) {
+    // Prevent double calls
+    if (isDeletingComment || commentToDeleteIndex === null) {
+      return;
+    }
+
+    setIsDeletingComment(true);
+    try {
       await deleteComment(task.id, commentToDeleteIndex, comments);
-      setComments(comments.filter((_, i) => i !== commentToDeleteIndex));
+      // Comments will be updated via onTaskUpdate callback
       setShowDeleteCommentModal(false);
       setCommentToDeleteIndex(null);
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+      setShowDeleteCommentModal(false);
+      setCommentToDeleteIndex(null);
+    } finally {
+      setIsDeletingComment(false);
     }
   };
 
@@ -253,12 +293,14 @@ export default function TaskDetailsScreen() {
 
           {/* Footer Buttons */}
           <View style={styles.footer}>
-            {task.done ? (
+            {task.status === "completed" ? (
               <Button
                 variant="danger"
                 title="Delete"
                 onPress={() => setShowDeleteModal(true)}
                 style={styles.footerButton}
+                disabled={isDeleting}
+                loading={isDeleting}
               />
             ) : (
               <TouchableOpacity
@@ -310,10 +352,13 @@ export default function TaskDetailsScreen() {
         <DeleteCommentModal
           visible={showDeleteCommentModal}
           onClose={() => {
-            setShowDeleteCommentModal(false);
-            setCommentToDeleteIndex(null);
+            if (!isDeletingComment) {
+              setShowDeleteCommentModal(false);
+              setCommentToDeleteIndex(null);
+            }
           }}
           onConfirm={handleDeleteCommentConfirm}
+          isLoading={isDeletingComment}
         />
 
         <Toast
@@ -329,20 +374,24 @@ export default function TaskDetailsScreen() {
           visible={showEditModal}
           task={task}
           onClose={() => setShowEditModal(false)}
-          onTaskUpdated={() => {
-            // Refresh task data
+          onTaskUpdated={async () => {
+            // Refresh task data from API
             if (id) {
-              const updatedTask = getTaskById(id);
-              if (updatedTask) {
-                setTask(updatedTask);
-                setComments(updatedTask.comments || []);
+              try {
+                const backendTask = await tasksAPI.getById(id);
+                const transformedTask = transformBackendTask(backendTask);
+                setTask(transformedTask);
+                setComments(transformedTask.comments || []);
+              } catch (error) {
+                console.error("Error refreshing task:", error);
               }
             }
             setShowEditModal(false);
           }}
           onTaskDeleted={() => {
             setShowEditModal(false);
-            handleDelete();
+            // Task is already deleted by the EditTaskModal, just navigate back
+            router.back();
           }}
         />
       )}

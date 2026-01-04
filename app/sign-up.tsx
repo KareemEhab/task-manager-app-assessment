@@ -18,6 +18,7 @@ import { BrandColors, CommonColors, LightColors, TextColors } from "@/constants/
 import { Button } from "@/components/common/button/button";
 import { Input } from "@/components/common/input/input";
 import { validateSignUp } from "@/utils/validation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SignUpScreen() {
   const [name, setName] = useState("");
@@ -30,8 +31,9 @@ export default function SignUpScreen() {
     password: "",
     confirmPassword: "",
   });
+  const { signUp, isLoading, error: authError } = useAuth();
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     Keyboard.dismiss();
 
     const validationErrors = validateSignUp({
@@ -48,8 +50,16 @@ export default function SignUpScreen() {
       return;
     }
 
-    // Handle sign up logic here
-    console.log("Sign up:", { name, email, password });
+    // Call sign-up API
+    const result = await signUp(name, email, password);
+    
+    if (!result.success) {
+      // Set error message if sign-up failed
+      setErrors({
+        ...errors,
+        email: result.error || "",
+      });
+    }
   };
 
   return (
@@ -151,9 +161,10 @@ export default function SignUpScreen() {
           <View style={styles.buttonsContainer}>
             <Button
               variant="primary"
-              title="Sign Up"
+              title={isLoading ? "Signing up..." : "Sign Up"}
               onPress={handleSignUp}
               style={styles.button}
+              disabled={isLoading}
             />
           </View>
 
