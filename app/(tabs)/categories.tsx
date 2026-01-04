@@ -18,7 +18,10 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { categories } from "@/data/categories";
+import { useCategories } from "@/hooks/useCategories";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
+import { ActivityIndicator } from "react-native";
 
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({
@@ -57,6 +60,14 @@ const getStyles = (isDark: boolean) =>
 export default function CategoriesScreen() {
   const { isDark } = useTheme();
   const styles = getStyles(isDark);
+  const { categories, isLoading, refetch: refetchCategories } = useCategories();
+
+  // Refresh data when screen focuses
+  useFocusEffect(
+    useCallback(() => {
+      refetchCategories();
+    }, [refetchCategories])
+  );
 
   return (
     <SafeAreaView
@@ -86,16 +97,38 @@ export default function CategoriesScreen() {
         <Text style={styles.title}>All Categories</Text>
         <View style={styles.backButton} />
       </View>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {categories.map((category) => (
-          <View key={category.id} style={{ marginBottom: 16 }}>
-            <CategoryCard {...category} fullWidth />
-          </View>
-        ))}
-      </ScrollView>
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <ActivityIndicator
+            size="large"
+            color={isDark ? CommonColors.white : TextColors.primary}
+          />
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {categories.length === 0 ? (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingTop: 60 }}>
+              <Text
+                style={[
+                  styles.title,
+                  { color: isDark ? CommonColors.white : TextColors.primary },
+                ]}
+              >
+                No categories found
+              </Text>
+            </View>
+          ) : (
+            categories.map((category) => (
+              <View key={category.id} style={{ marginBottom: 16 }}>
+                <CategoryCard {...category} fullWidth />
+              </View>
+            ))
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
