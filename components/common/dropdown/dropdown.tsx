@@ -1,13 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useRef, useState } from "react";
 import {
-  findNodeHandle,
   InteractionManager,
   Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
-  UIManager,
   View,
 } from "react-native";
 
@@ -64,7 +62,7 @@ export function Dropdown({
                 // Calculate scroll offset (position - some padding)
                 // pageY is relative to the window, we need to account for the ScrollView's contentOffset
                 const scrollOffset = Math.max(0, pageY - 150); // 150px padding from top
-                
+
                 // For regular ScrollView and BottomSheetScrollView (both extend ScrollView)
                 if (scrollViewRef.current.scrollTo) {
                   scrollViewRef.current.scrollTo({
@@ -73,7 +71,9 @@ export function Dropdown({
                   });
                 }
                 // Fallback: Try scrollToOffset for BottomSheetScrollView (if available)
-                else if (typeof scrollViewRef.current.scrollToOffset === 'function') {
+                else if (
+                  typeof scrollViewRef.current.scrollToOffset === "function"
+                ) {
                   scrollViewRef.current.scrollToOffset({
                     offset: scrollOffset,
                     animated: true,
@@ -83,26 +83,9 @@ export function Dropdown({
                 // Silently fail if scroll fails
                 console.log("Could not scroll to dropdown:", e);
               }
-            } else {
-              // Fallback: Try to find parent ScrollView automatically
-              const handle = findNodeHandle(containerRef.current);
-              if (handle) {
-                try {
-                  // Measure layout relative to root
-                  UIManager.measureLayout(
-                    handle,
-                    null,
-                    (x, y, width, height) => {
-                      // Position relative to root - could use this for window scrolling
-                      // but without ScrollView ref, we can't scroll programmatically
-                    },
-                    () => {} // onFailure
-                  );
-                } catch (e) {
-                  // Silently fail
-                }
-              }
             }
+            // Note: Without a scrollViewRef, we can't programmatically scroll
+            // The dropdown will still be visible, just may require manual scrolling
           });
         }, 150); // Small delay to ensure dropdown is rendered
       });

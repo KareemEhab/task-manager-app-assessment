@@ -1,7 +1,7 @@
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import type { ComponentRef } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BottomDrawer } from "@/components/common/bottom-drawer/bottom-drawer";
 import { Button } from "@/components/common/button/button";
@@ -14,8 +14,8 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task } from "@/types/tasks";
 import { useTasks } from "@/hooks/useTasks";
+import { Task } from "@/types/tasks";
 import {
   TaskFormData,
   TaskFormErrors,
@@ -39,8 +39,8 @@ export function EditTaskModal({
   onTaskDeleted,
 }: EditTaskModalProps) {
   const { isDark } = useTheme();
-  const insets = useSafeAreaInsets();
-  const scrollViewRef = useRef<BottomSheetScrollView>(null);
+  const scrollViewRef =
+    useRef<ComponentRef<typeof BottomSheetScrollView>>(null);
   const [formData, setFormData] = useState<TaskFormData>({
     title: "",
     description: "",
@@ -67,7 +67,7 @@ export function EditTaskModal({
       onTaskUpdated();
     },
     onTaskDelete: () => {
-      // Only close modal if deletion was successful (no error thrown)
+      // Only close modal if deletion was successful
       setShowDeleteModal(false);
       // Delay closing the modal to allow toast to be visible
       // Toast is set in the deleteTask hook, so we wait for it to show

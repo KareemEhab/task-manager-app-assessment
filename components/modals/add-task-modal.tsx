@@ -171,7 +171,6 @@ const getStyles = (isDark: boolean) =>
       paddingHorizontal: 24,
       paddingTop: 16,
       paddingBottom: 16,
-      // Match drawer background for consistent contrast
       backgroundColor: isDark ? DarkColors.darkBackground : LightColors.light4,
       zIndex: 5000,
       elevation: 5000,
