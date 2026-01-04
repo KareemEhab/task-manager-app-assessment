@@ -1,13 +1,7 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
-import {
-  BrandColors,
-  CommonColors,
-  DarkColors,
-  LightColors,
-  TextColors,
-} from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
+import { getTabsStyles } from "./tabs.styles";
 
 type Tab = {
   label: string;
@@ -22,7 +16,7 @@ type TabsProps = {
 
 export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
   const { isDark } = useTheme();
-  const styles = getStyles(isDark);
+  const styles = getTabsStyles(isDark);
 
   return (
     <View style={styles.container}>
@@ -31,33 +25,11 @@ export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
         return (
           <TouchableOpacity
             key={tab.value}
-            style={[
-              styles.tab,
-              isActive && styles.tabActive,
-              {
-                backgroundColor: isActive
-                  ? isDark
-                    ? DarkColors.darkBorder
-                    : TextColors.secondary
-                  : "transparent",
-              },
-            ]}
+            style={[styles.tab, isActive && styles.tabActive]}
             onPress={() => onTabChange(tab.value)}
             activeOpacity={0.7}
           >
-            <Text
-              style={[
-                styles.tabText,
-                isActive && styles.tabTextActive,
-                {
-                  color: isActive
-                    ? CommonColors.white
-                    : isDark
-                      ? DarkColors.dark4
-                      : TextColors.secondary,
-                },
-              ]}
-            >
+            <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
               {tab.label}
             </Text>
           </TouchableOpacity>
@@ -66,27 +38,3 @@ export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
     </View>
   );
 }
-
-const getStyles = (isDark: boolean) =>
-  StyleSheet.create({
-    container: {
-      flexDirection: "row",
-      gap: 8,
-    },
-    tab: {
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 8,
-    },
-    tabActive: {
-      // Background color is set inline based on theme
-    },
-    tabText: {
-      fontSize: 14,
-      fontWeight: "500",
-    },
-    tabTextActive: {
-      fontWeight: "600",
-    },
-  });
-
