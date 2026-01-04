@@ -9,7 +9,7 @@ import {
 
 export const inputStyles = StyleSheet.create({
   container: {
-    marginBottom: 6,
+    marginBottom: 10,
   },
   label: {
     fontSize: 14,
@@ -31,6 +31,12 @@ export const inputStyles = StyleSheet.create({
     fontSize: 16,
     color: TextColors.primary,
   },
+  textarea: {
+    height: 100,
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingRight: 16,
+  },
   inputFilled: {
     backgroundColor: LightColors.light3,
     borderColor: BrandColors.main,
@@ -49,8 +55,6 @@ export const inputStyles = StyleSheet.create({
   },
   errorContainer: {
     marginTop: 4,
-    height: 20,
-    justifyContent: "flex-start",
   },
   errorText: {
     fontSize: 12,

@@ -102,6 +102,7 @@ export default function SignUpScreen() {
               }}
               type="text"
               error={errors.name}
+              themeMode="light"
             />
             <Input
               label="Email"
@@ -115,6 +116,7 @@ export default function SignUpScreen() {
               }}
               type="email"
               error={errors.email}
+              themeMode="light"
             />
             <Input
               label="Password"
@@ -128,6 +130,7 @@ export default function SignUpScreen() {
               }}
               type="password"
               error={errors.password}
+              themeMode="light"
             />
             <Input
               label="Confirm Password"
@@ -141,6 +144,7 @@ export default function SignUpScreen() {
               }}
               type="password"
               error={errors.confirmPassword}
+              themeMode="light"
             />
           </View>
 

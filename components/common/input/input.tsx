@@ -2,14 +2,21 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
 import { Text, TextInput, TextInputProps, TouchableOpacity, View } from "react-native";
 
-import { TextColors } from "@/constants/theme";
+import { BrandColors, CommonColors, DarkColors, LightColors, TextColors } from "@/constants/theme";
+import { useTheme } from "@/contexts/theme-context";
 import { inputStyles } from "./input.styles";
 
 export type InputProps = TextInputProps & {
   label: string;
   placeholder?: string;
   error?: string;
-  type?: "text" | "password" | "email";
+  type?: "text" | "password" | "email" | "textarea";
+  variant?: "default" | "textarea";
+  /**
+   * Theme mode for this input. Use "light" to keep auth screens consistent
+   * even when the app is in dark mode.
+   */
+  themeMode?: "auto" | "light" | "dark";
 };
 
 export function Input({
@@ -17,12 +24,18 @@ export function Input({
   placeholder,
   error,
   type = "text",
+  variant = "default",
+  themeMode = "auto",
   value,
   onChangeText,
   ...props
 }: InputProps) {
+  const { isDark: appIsDark } = useTheme();
+  const isDark =
+    themeMode === "auto" ? appIsDark : themeMode === "dark";
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = type === "password";
+  const isTextarea = variant === "textarea" || type === "textarea";
   const isFilled = value && value.length > 0;
   const hasError = !!error;
 
@@ -32,22 +45,49 @@ export function Input({
 
   return (
     <View style={inputStyles.container}>
-      <Text style={inputStyles.label}>{label}</Text>
+      <Text
+        style={[
+          inputStyles.label,
+          { color: isDark ? DarkColors.dark4 : TextColors.primary },
+        ]}
+      >
+        {label}
+      </Text>
       <View style={inputStyles.inputContainer}>
         <TextInput
           {...props}
           style={[
             inputStyles.input,
+            isTextarea && inputStyles.textarea,
             isFilled && inputStyles.inputFilled,
             hasError && inputStyles.inputError,
+            {
+              // Always use a dark surface in dark mode (avoid "transparent"/light looking fields)
+              backgroundColor: isDark
+                ? DarkColors.darkText
+                : isFilled
+                  ? LightColors.light3
+                  : "transparent",
+              borderColor: hasError
+                ? CommonColors.error
+                : isFilled
+                  ? BrandColors.main
+                  : isDark
+                    ? DarkColors.dark3
+                    : LightColors.light1,
+              color: isDark ? CommonColors.white : TextColors.primary,
+            },
           ]}
           placeholder={placeholder}
-          placeholderTextColor={TextColors.placeholder}
+          placeholderTextColor={isDark ? DarkColors.dark4 : TextColors.placeholder}
           value={value}
           onChangeText={onChangeText}
           secureTextEntry={isPassword && !isPasswordVisible}
           autoCapitalize={type === "email" ? "none" : "sentences"}
           keyboardType={type === "email" ? "email-address" : "default"}
+          multiline={isTextarea}
+          numberOfLines={isTextarea ? 4 : undefined}
+          textAlignVertical={isTextarea ? "top" : "center"}
         />
         {isPassword && (
           <TouchableOpacity
@@ -58,14 +98,16 @@ export function Input({
             <Ionicons
               name={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
               size={20}
-              color={TextColors.secondary}
+              color={isDark ? DarkColors.dark4 : TextColors.secondary}
             />
           </TouchableOpacity>
         )}
       </View>
-      <View style={inputStyles.errorContainer}>
-        {hasError && <Text style={inputStyles.errorText}>{error}</Text>}
-      </View>
+      {hasError && (
+        <View style={inputStyles.errorContainer}>
+          <Text style={inputStyles.errorText}>{error}</Text>
+        </View>
+      )}
     </View>
   );
 }

@@ -89,6 +89,7 @@ export default function SignInScreen() {
                 }}
                 type="email"
                 error={errors.email}
+                themeMode="light"
               />
               <Input
                 label="Password"
@@ -102,6 +103,7 @@ export default function SignInScreen() {
                 }}
                 type="password"
                 error={errors.password}
+                themeMode="light"
               />
             </View>
 
