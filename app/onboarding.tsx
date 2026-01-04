@@ -3,16 +3,17 @@ import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 
-import { BrandColors, TextColors } from "@/constants/theme";
 import { Button } from "@/components/common/button/button";
 import { ImageSlider } from "@/components/ui/image-slider";
+import { BrandColors, TextColors } from "@/constants/theme";
 
-// TODO: Replace with actual onboarding images
-const onboardingImages = [
-  require("@/assets/images/icon.png"),
-  require("@/assets/images/icon.png"),
-  require("@/assets/images/icon.png"),
-];
+// Import onboarding images - Metro bundler resolves images from project root
+const onboardingImage1 = require("../assets/images/IMG_3271.webp");
+const onboardingImage2 = require("../assets/images/IMG_3272.webp");
+const onboardingImage3 = require("../assets/images/IMG_3273.webp");
+
+// Onboarding images array
+const onboardingImages = [onboardingImage1, onboardingImage2, onboardingImage3];
 
 export default function OnboardingScreen() {
   const handleSignIn = () => {

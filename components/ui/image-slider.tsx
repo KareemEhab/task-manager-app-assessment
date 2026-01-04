@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   image: {
     width: PHONE_WIDTH,
     height: PHONE_HEIGHT,
-    borderRadius: 24,
+    borderRadius: 32,
     overflow: "hidden",
   },
   dotsContainer: {
