@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { useTheme } from "@/contexts/theme-context";
 import { getTabsStyles } from "./tabs.styles";
@@ -19,7 +19,12 @@ export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
   const styles = getTabsStyles(isDark);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.container}
+      style={styles.scrollView}
+    >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.value;
         return (
@@ -35,6 +40,6 @@ export function Tabs({ tabs, activeTab, onTabChange }: TabsProps) {
           </TouchableOpacity>
         );
       })}
-    </View>
+    </ScrollView>
   );
 }

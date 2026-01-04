@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
-import { useState } from "react";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { InteractionManager, Keyboard, Platform, Text, TouchableOpacity, View } from "react-native";
 
 import { BrandColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
@@ -13,6 +13,7 @@ type CategoriesInputProps = {
   categories: string[];
   onChange: (categories: string[]) => void;
   error?: string;
+  scrollViewRef?: React.RefObject<any>; // For auto-scrolling when focused
 };
 
 export function CategoriesInput({
@@ -20,13 +21,47 @@ export function CategoriesInput({
   categories,
   onChange,
   error,
+  scrollViewRef,
 }: CategoriesInputProps) {
   const { isDark } = useTheme();
   const [inputValue, setInputValue] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<View>(null);
   const hasError = !!error;
   const isFilled = categories.length > 0;
 
   const styles = getCategoriesInputStyles(isDark, isFilled, hasError);
+
+  // Auto-scroll when input is focused
+  useEffect(() => {
+    if (isFocused && scrollViewRef?.current && inputRef.current) {
+      // Wait for keyboard to appear and then scroll
+      const timer = setTimeout(() => {
+        try {
+          InteractionManager.runAfterInteractions(() => {
+            if (!scrollViewRef?.current || !inputRef.current) return;
+            
+            // Use a simpler approach: measure the input's position
+            inputRef.current.measure((x, y, width, height, pageX, pageY) => {
+              if (scrollViewRef?.current && pageY > 0) {
+                // Scroll to show the input with some padding from top
+                const scrollOffset = Math.max(0, pageY - 150);
+                scrollViewRef.current.scrollTo({
+                  y: scrollOffset,
+                  animated: true,
+                });
+              }
+            });
+          });
+        } catch (error) {
+          // Silently fail if scroll fails
+          console.log("Auto-scroll failed:", error);
+        }
+      }, 400); // Wait for keyboard animation
+
+      return () => clearTimeout(timer);
+    }
+  }, [isFocused, scrollViewRef]);
 
   const handleAddCategory = () => {
     const trimmed = inputValue.trim();
@@ -46,8 +81,18 @@ export function CategoriesInput({
     }
   };
 
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    // Don't manually dismiss keyboard - let the system handle it
+    // Manually dismissing can cause crashes with BottomSheet
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={styles.container} ref={inputRef} collapsable={false}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputContainer}>
         <View
@@ -65,6 +110,8 @@ export function CategoriesInput({
             onChangeText={setInputValue}
             onSubmitEditing={handleAddCategory}
             onKeyPress={handleKeyPress}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             autoComplete="off"
             autoCorrect={false}
             spellCheck={false}
@@ -72,6 +119,8 @@ export function CategoriesInput({
             textContentType="none"
             editable={true}
             autoFocus={false}
+            returnKeyType="done"
+            blurOnSubmit={false}
             {...(Platform.OS === "android"
               ? ({ includeFontPadding: false } as any)
               : {})} // Remove Android's default font padding

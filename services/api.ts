@@ -130,6 +130,10 @@ export const tasksAPI = {
     const response = await api.get("/api/tasks");
     return response.data;
   },
+  getCreatedByMe: async () => {
+    const response = await api.get("/api/tasks/created-by-me");
+    return response.data;
+  },
   getById: async (id: string) => {
     const response = await api.get(`/api/tasks/${id}`);
     return response.data;

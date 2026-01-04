@@ -58,6 +58,7 @@ export function TaskFormFields({
         onChange={(date) => onFieldChange("dueDate", date)}
         error={errors.dueDate}
         minimumDate={minimumDate}
+        scrollViewRef={scrollViewRef}
       />
 
       <Input
@@ -75,6 +76,7 @@ export function TaskFormFields({
         categories={formData.categories}
         onChange={(categories) => onFieldChange("categories", categories)}
         error={errors.categories}
+        scrollViewRef={scrollViewRef}
       />
 
       <Dropdown

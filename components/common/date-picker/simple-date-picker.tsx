@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useState } from "react";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { InteractionManager, Platform, Text, TouchableOpacity, View } from "react-native";
 
 import { DarkColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
@@ -13,6 +13,7 @@ type SimpleDatePickerProps = {
   onChange: (date: Date) => void;
   error?: string;
   minimumDate?: Date;
+  scrollViewRef?: React.RefObject<any>; // For auto-scrolling when picker opens
 };
 
 export function SimpleDatePicker({
@@ -21,10 +22,12 @@ export function SimpleDatePicker({
   onChange,
   error,
   minimumDate,
+  scrollViewRef,
 }: SimpleDatePickerProps) {
   const { isDark } = useTheme();
   const [showPicker, setShowPicker] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(value || new Date());
+  const containerRef = useRef<View>(null);
   const iosMajorVersion =
     Platform.OS === "ios"
       ? typeof Platform.Version === "string"
@@ -34,6 +37,37 @@ export function SimpleDatePicker({
 
   const hasError = !!error;
   const isFilled = !!value;
+
+  // Auto-scroll when picker opens
+  useEffect(() => {
+    if (showPicker && scrollViewRef?.current && containerRef.current) {
+      // Wait for picker to render and then scroll
+      const timer = setTimeout(() => {
+        try {
+          InteractionManager.runAfterInteractions(() => {
+            if (!scrollViewRef?.current || !containerRef.current) return;
+            
+            // Measure the container's position
+            containerRef.current.measure((x, y, width, height, pageX, pageY) => {
+              if (scrollViewRef?.current && pageY > 0) {
+                // Scroll to show the date picker with some padding from top
+                const scrollOffset = Math.max(0, pageY - 150);
+                scrollViewRef.current.scrollTo({
+                  y: scrollOffset,
+                  animated: true,
+                });
+              }
+            });
+          });
+        } catch (error) {
+          // Silently fail if scroll fails
+          console.log("Date picker auto-scroll failed:", error);
+        }
+      }, 300); // Wait for picker animation
+
+      return () => clearTimeout(timer);
+    }
+  }, [showPicker, scrollViewRef]);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -67,7 +101,7 @@ export function SimpleDatePicker({
   const styles = getSimpleDatePickerStyles(isDark, isFilled, hasError);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} ref={containerRef} collapsable={false}>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity
         style={[

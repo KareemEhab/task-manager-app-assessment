@@ -52,29 +52,38 @@ export function AddTaskModal({
 
   const { createTask } = useTasks({
     onSuccess: () => {
-      handleClose();
-      setShowToast(true);
+      // Dismiss keyboard before closing to prevent crashes
+      Keyboard.dismiss();
       setTimeout(() => {
-        setShowToast(false);
-        onTaskAdded();
-      }, 2000);
+        handleClose();
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+          onTaskAdded();
+        }, 2000);
+      }, 100);
     },
   });
 
   const styles = getStyles(isDark);
 
   const handleClose = () => {
-    setFormData({
-      title: "",
-      description: "",
-      dueDate: null,
-      priority: "low",
-      status: "upcoming",
-      categories: [],
-      assignedTo: "",
-    });
-    setErrors({});
-    onClose();
+    // Dismiss keyboard before closing to prevent crashes
+    Keyboard.dismiss();
+    // Small delay to ensure keyboard is dismissed before state updates
+    setTimeout(() => {
+      setFormData({
+        title: "",
+        description: "",
+        dueDate: null,
+        priority: "low",
+        status: "upcoming",
+        categories: [],
+        assignedTo: "",
+      });
+      setErrors({});
+      onClose();
+    }, 100);
   };
 
   const handleFieldChange = (field: keyof TaskFormData, value: any) => {

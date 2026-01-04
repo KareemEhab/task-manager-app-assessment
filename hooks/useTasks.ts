@@ -73,6 +73,9 @@ export function useTasks({
       setTimeout(() => {
         setShowToast(false);
       }, 2000);
+
+      // Categories will update automatically via CategoriesContext when task status changes
+      // No need to call onCategoriesUpdate anymore
     } catch (error: any) {
       // Rollback optimistic update on error
       updateTaskInContext(task.id, previousTask);
@@ -162,6 +165,14 @@ export function useTasks({
     const currentTask = getTaskById(taskId);
     const previousTask = currentTask ? { ...currentTask } : null;
 
+    // Check if status is changing to/from completed (affects category percentages)
+    const wasCompleted = currentTask?.status === "completed";
+    const isChangingToCompleted =
+      updates.status === "completed" && !wasCompleted;
+    const isChangingFromCompleted =
+      wasCompleted && updates.status && updates.status !== "completed";
+    const statusChanged = isChangingToCompleted || isChangingFromCompleted;
+
     // Optimistic update: Update context immediately
     updateTaskInContext(taskId, {
       ...updates,
@@ -190,6 +201,9 @@ export function useTasks({
           lastUpdated: transformedTask.lastUpdated,
         });
       }
+
+      // Categories will update automatically via CategoriesContext when task status changes
+      // No need to call onCategoriesUpdate anymore
 
       setToastMessage("Task was updated successfully");
       setShowToast(true);

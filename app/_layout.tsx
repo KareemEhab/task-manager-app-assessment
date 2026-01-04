@@ -1,20 +1,21 @@
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-gesture-handler";
-import "react-native-reanimated";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "react-native-reanimated";
 
+import { CategoriesProvider } from "@/contexts/categories-context";
+import { TasksProvider } from "@/contexts/tasks-context";
 import {
   ThemeProvider as AppThemeProvider,
   useTheme,
 } from "@/contexts/theme-context";
-import { TasksProvider } from "@/contexts/tasks-context";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -41,9 +42,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AppThemeProvider>
         <TasksProvider>
-          <BottomSheetModalProvider>
-            <RootLayoutNav />
-          </BottomSheetModalProvider>
+          <CategoriesProvider>
+            <BottomSheetModalProvider>
+              <RootLayoutNav />
+            </BottomSheetModalProvider>
+          </CategoriesProvider>
         </TasksProvider>
       </AppThemeProvider>
     </GestureHandlerRootView>

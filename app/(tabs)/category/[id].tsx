@@ -24,6 +24,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { Task } from "@/types/tasks";
 import { useFetchTasks } from "@/hooks/useFetchTasks";
 import { useCategories } from "@/hooks/useCategories";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({
@@ -87,6 +88,7 @@ export default function CategoryTasksScreen() {
     useFetchTasks();
   const { categories, isLoading: categoriesLoading, refetch: refetchCategories } =
     useCategories();
+  const { user } = useCurrentUser();
 
   // Tasks and categories are managed by context, no need to refetch on focus
 
@@ -96,12 +98,29 @@ export default function CategoryTasksScreen() {
   }, [categories, id]);
 
   // Filter tasks by category and sort by date (newest to oldest)
+  // Exclude tasks created by me but assigned to others
   const categoryTasks = useMemo(() => {
     if (!category || !allTasks.length) return [];
 
+    // Filter out tasks created by me but assigned to others
+    const myTasks = allTasks.filter((task) => {
+      if (!user) return true;
+      
+      // If task has assignedTo, it must be assigned to me
+      if (task.assignedTo) {
+        const userEmailLower = user.email?.toLowerCase();
+        const assignedToLower = task.assignedTo?.toLowerCase();
+        return assignedToLower === userEmailLower;
+      }
+      
+      // If no assignedTo, only show if created by me
+      const isCreatedByMe = task.createdBy === user.name || task.createdBy === user.email;
+      return isCreatedByMe;
+    });
+
     // Filter tasks that include this category name in their categories array
     // Tasks store category names, so we match by name
-    const filtered = allTasks.filter((task) =>
+    const filtered = myTasks.filter((task) =>
       task.categories.some((taskCategory) => 
         taskCategory.toLowerCase().trim() === category.name.toLowerCase().trim()
       )
@@ -113,7 +132,7 @@ export default function CategoryTasksScreen() {
       const dateB = b.createdOn.getTime();
       return dateB - dateA; // Newest first (top to bottom)
     });
-  }, [allTasks, category]);
+  }, [allTasks, category, user]);
 
   const isLoading = tasksLoading || categoriesLoading;
 

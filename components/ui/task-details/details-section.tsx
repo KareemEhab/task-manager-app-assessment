@@ -11,6 +11,7 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Task } from "@/types/tasks";
 
 type DetailsSectionProps = {
@@ -25,9 +26,25 @@ export function DetailsSection({
   onToggleExpand,
 }: DetailsSectionProps) {
   const { isDark } = useTheme();
+  const { user } = useCurrentUser();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [showExpandButton, setShowExpandButton] = useState(false);
   const styles = getStyles(isDark);
+
+  // Determine assigned to display text
+  const getAssignedToText = () => {
+    if (!task.assignedTo) return null;
+    
+    // Compare emails (both lowercased)
+    const userEmailLower = user?.email?.toLowerCase();
+    const assignedToLower = task.assignedTo.toLowerCase();
+    
+    if (userEmailLower && assignedToLower === userEmailLower) {
+      return "You";
+    }
+    
+    return task.assignedTo;
+  };
 
   // Check if description is long enough to potentially need expansion
   // Approximate: 5 lines * ~50 characters per line = ~250 characters
@@ -128,6 +145,14 @@ export function DetailsSection({
           )}
         </View>
       </View>
+
+      {/* Assigned To */}
+      {task.assignedTo && (
+        <View style={styles.detailBox}>
+          <Text style={styles.label}>Assigned To</Text>
+          <Text style={styles.value}>{getAssignedToText()}</Text>
+        </View>
+      )}
 
       {/* Additional Details */}
       <View style={styles.additionalDetailsSection}>

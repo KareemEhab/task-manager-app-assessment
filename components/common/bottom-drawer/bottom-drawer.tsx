@@ -64,9 +64,11 @@ export function BottomDrawer({
       topInset={insets.top}
       // Let the sheet itself respect the safe-area, so we don't need extra scroll padding
       bottomInset={insets.bottom}
-      keyboardBehavior={Platform.OS === "ios" ? "interactive" : "extend"}
+      keyboardBehavior="interactive"
       keyboardBlurBehavior="restore"
       android_keyboardInputMode="adjustResize"
+      enableHandlePanningGesture={true}
+      enableContentPanningGesture={true}
     >
       {children}
     </BottomSheetModal>
