@@ -60,14 +60,7 @@ const getStyles = (isDark: boolean) =>
 export default function CategoriesScreen() {
   const { isDark } = useTheme();
   const styles = getStyles(isDark);
-  const { categories, isLoading, refetch: refetchCategories } = useCategories();
-
-  // Refresh data when screen focuses
-  useFocusEffect(
-    useCallback(() => {
-      refetchCategories();
-    }, [refetchCategories])
-  );
+  const { categories, isLoading } = useCategories();
 
   return (
     <SafeAreaView

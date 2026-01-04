@@ -86,8 +86,7 @@ export default function CategoryTasksScreen() {
   const styles = getStyles(isDark);
   const { tasks: allTasks, isLoading: tasksLoading, refetch: refetchTasks } =
     useFetchTasks();
-  const { categories, isLoading: categoriesLoading, refetch: refetchCategories } =
-    useCategories();
+  const { categories, isLoading: categoriesLoading } = useCategories();
   const { user } = useCurrentUser();
 
   // Tasks and categories are managed by context, no need to refetch on focus
@@ -102,19 +101,30 @@ export default function CategoryTasksScreen() {
   const categoryTasks = useMemo(() => {
     if (!category || !allTasks.length) return [];
 
-    // Filter out tasks created by me but assigned to others
+    // Filter tasks: Include all tasks assigned to me (regardless of creator)
+    // Exclude only tasks created by me but assigned to others
     const myTasks = allTasks.filter((task) => {
-      if (!user) return true;
+      if (!user) return false;
       
-      // If task has assignedTo, it must be assigned to me
+      const userEmailLower = user.email?.toLowerCase();
+      const isCreatedByMe = task.createdBy === user.name || task.createdBy === user.email;
+      
+      // If task has assignedTo, check if it's assigned to me
       if (task.assignedTo) {
-        const userEmailLower = user.email?.toLowerCase();
         const assignedToLower = task.assignedTo?.toLowerCase();
-        return assignedToLower === userEmailLower;
+        const isAssignedToMe = assignedToLower === userEmailLower;
+        
+        // Include if assigned to me (regardless of who created it)
+        // Exclude if created by me but assigned to someone else
+        if (isAssignedToMe) {
+          return true; // Assigned to me - include (even if created by someone else)
+        } else if (isCreatedByMe) {
+          return false; // Created by me but assigned to others - exclude
+        }
+        return false; // Assigned to someone else, not created by me - exclude
       }
       
-      // If no assignedTo, only show if created by me
-      const isCreatedByMe = task.createdBy === user.name || task.createdBy === user.email;
+      // If no assignedTo, only include if created by me
       return isCreatedByMe;
     });
 

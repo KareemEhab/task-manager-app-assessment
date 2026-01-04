@@ -1,13 +1,12 @@
-import { useCategoriesContext } from "@/contexts/categories-context";
+import { useTasksContext } from "@/contexts/tasks-context";
 
-// This hook now uses the CategoriesContext for optimistic updates
+// This hook now uses the TasksContext for categories
 export function useCategories() {
-  const { categories, isLoading, error, refetch } = useCategoriesContext();
+  const { categories, isLoading, error } = useTasksContext();
   return {
     categories,
     isLoading,
     error,
-    refetch,
   };
 }
 

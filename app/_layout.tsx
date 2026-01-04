@@ -10,7 +10,6 @@ import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
-import { CategoriesProvider } from "@/contexts/categories-context";
 import { TasksProvider } from "@/contexts/tasks-context";
 import {
   ThemeProvider as AppThemeProvider,
@@ -42,11 +41,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AppThemeProvider>
         <TasksProvider>
-          <CategoriesProvider>
-            <BottomSheetModalProvider>
-              <RootLayoutNav />
-            </BottomSheetModalProvider>
-          </CategoriesProvider>
+          <BottomSheetModalProvider>
+            <RootLayoutNav />
+          </BottomSheetModalProvider>
         </TasksProvider>
       </AppThemeProvider>
     </GestureHandlerRootView>

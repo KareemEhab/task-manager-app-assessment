@@ -62,7 +62,7 @@ export default function HomeScreen() {
   const { isDark } = useTheme();
   const styles = getStyles(isDark);
   const { tasks: allTasks, isLoading: tasksLoading, refetch: refetchTasks } = useFetchTasks();
-  const { categories, isLoading: categoriesLoading, refetch: refetchCategories } = useCategories();
+  const { categories, isLoading: categoriesLoading } = useCategories();
   const { user, isLoading: userLoading, refetch: refetchUser } = useCurrentUser();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -73,11 +73,16 @@ export default function HomeScreen() {
   const hasNoData = !tasksLoading && allTasks.length === 0;
   const isLoading = tasksLoading || categoriesLoading || userLoading;
 
-  // Only refetch user on focus (tasks and categories are managed by context)
+  // Refetch user and tasks on focus (especially after login)
   useFocusEffect(
     useCallback(() => {
       refetchUser();
-    }, [refetchUser])
+      // If we have a user but no tasks and we're not loading, refetch tasks
+      // This handles the case where user logs in and navigates to home
+      if (user && allTasks.length === 0 && !tasksLoading) {
+        refetchTasks();
+      }
+    }, [refetchUser, refetchTasks, user, allTasks.length, tasksLoading])
   );
 
   const handleCreateTask = () => {

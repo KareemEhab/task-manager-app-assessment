@@ -60,35 +60,33 @@ export function TasksHome({ tasks, onTaskPress }: TasksHomeProps) {
     return isCreatedByMe;
   });
 
-  // Fetch tasks created by me but assigned to others
+  // Fetch tasks created by me but assigned to others on component mount
   useEffect(() => {
     const fetchAssignedToOthers = async () => {
-      if (activeTab === "assigned-to-others") {
-        setIsLoadingAssigned(true);
-        try {
-          const backendTasks = await tasksAPI.getCreatedByMe();
-          const transformedTasks = backendTasks.map(transformBackendTask);
-          setAssignedToOthersTasks(transformedTasks);
-        } catch (error: any) {
-          console.error("Error fetching assigned to others tasks:", error);
-          // Log more details about the error
-          if (error.response) {
-            console.error("Response status:", error.response.status);
-            console.error("Response data:", error.response.data);
-          } else if (error.request) {
-            console.error("Request error:", error.request);
-          } else {
-            console.error("Error message:", error.message);
-          }
-          setAssignedToOthersTasks([]);
-        } finally {
-          setIsLoadingAssigned(false);
+      setIsLoadingAssigned(true);
+      try {
+        const backendTasks = await tasksAPI.getCreatedByMe();
+        const transformedTasks = backendTasks.map(transformBackendTask);
+        setAssignedToOthersTasks(transformedTasks);
+      } catch (error: any) {
+        console.error("Error fetching assigned to others tasks:", error);
+        // Log more details about the error
+        if (error.response) {
+          console.error("Response status:", error.response.status);
+          console.error("Response data:", error.response.data);
+        } else if (error.request) {
+          console.error("Request error:", error.request);
+        } else {
+          console.error("Error message:", error.message);
         }
+        setAssignedToOthersTasks([]);
+      } finally {
+        setIsLoadingAssigned(false);
       }
     };
 
     fetchAssignedToOthers();
-  }, [activeTab]);
+  }, []); // Fetch on mount, not when tab changes
 
   // Calculate task counts (excluding tasks assigned to others)
   const activeCount = myTasks.filter((task) => task.status !== "completed").length;
