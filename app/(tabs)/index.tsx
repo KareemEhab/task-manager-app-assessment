@@ -19,7 +19,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { useCategories } from "@/hooks/useCategories";
 import { useFetchTasks } from "@/hooks/useFetchTasks";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({

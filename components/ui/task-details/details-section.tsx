@@ -11,7 +11,7 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 
 type DetailsSectionProps = {
   task: Task;

@@ -2,7 +2,7 @@ import { CategoriesInput } from "@/components/common/categories-input/categories
 import { SimpleDatePicker } from "@/components/common/date-picker/simple-date-picker";
 import { Dropdown } from "@/components/common/dropdown/dropdown";
 import { Input } from "@/components/common/input/input";
-import { TaskPriority, TaskStatus } from "@/data/tasks";
+import { TaskPriority, TaskStatus } from "@/types/tasks";
 import { TaskFormData, TaskFormErrors } from "@/utils/task-validation";
 
 type TaskFormFieldsProps = {

@@ -11,7 +11,7 @@ import {
 
 import { CommonColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 import { useCalendar } from "@/hooks/useCalendar";
 import { getCalendarStyles } from "./calendar.styles";
 import { MonthYearPicker } from "./month-year-picker";

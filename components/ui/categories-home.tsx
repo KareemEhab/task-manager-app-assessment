@@ -9,7 +9,7 @@ import {
 
 import { BrandColors, CommonColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Category } from "@/data/categories";
+import { Category } from "@/types/categories";
 import { CategoryCard } from "./category-card";
 
 type CategoriesHomeProps = {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 
 export function useCalendar(tasks: Task[]) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());

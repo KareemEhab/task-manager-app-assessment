@@ -1,4 +1,4 @@
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 
 // Backend task type (from MongoDB)
 export type BackendTask = {
@@ -53,7 +53,6 @@ export function transformBackendTask(backendTask: BackendTask): Task {
         comment: comment.comment,
         createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
       })),
-    done: backendTask.done || false,
   };
 }
 

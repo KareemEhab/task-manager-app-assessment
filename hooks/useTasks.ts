@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import { useTasksContext } from "@/contexts/tasks-context";
-import { Task, TaskComment } from "@/data/tasks";
 import { commentsAPI, tasksAPI } from "@/services/api";
+import { Task, TaskComment } from "@/types/tasks";
 import {
   transformBackendTask,
   transformFrontendTask,

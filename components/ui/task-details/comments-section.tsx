@@ -9,7 +9,7 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { TaskComment } from "@/data/tasks";
+import { TaskComment } from "@/types/tasks";
 
 type CommentsSectionProps = {
   comments: TaskComment[];

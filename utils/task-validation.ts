@@ -1,4 +1,4 @@
-import { TaskPriority, TaskStatus } from "@/data/tasks";
+import { TaskPriority, TaskStatus } from "@/types/tasks";
 
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

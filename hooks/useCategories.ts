@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Category } from "@/data/categories";
+import { Category } from "@/types/categories";
 import { categoriesAPI } from "@/services/api";
 
 // Gradient colors mapping for categories

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 import { tasksAPI } from "@/services/api";
 import { transformBackendTask } from "@/utils/task-transform";
 

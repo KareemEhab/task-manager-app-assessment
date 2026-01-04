@@ -1,4 +1,5 @@
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import type { ComponentRef } from "react";
 import { useRef, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -13,8 +14,8 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task } from "@/data/tasks";
 import { useTasks } from "@/hooks/useTasks";
+import { Task } from "@/types/tasks";
 import {
   TaskFormData,
   TaskFormErrors,
@@ -35,7 +36,8 @@ export function AddTaskModal({
 }: AddTaskModalProps) {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  const scrollViewRef = useRef<BottomSheetScrollView>(null);
+  const scrollViewRef =
+    useRef<ComponentRef<typeof BottomSheetScrollView>>(null);
   const [formData, setFormData] = useState<TaskFormData>({
     title: "",
     description: "",

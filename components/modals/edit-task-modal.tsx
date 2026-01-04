@@ -14,7 +14,7 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 import { useTasks } from "@/hooks/useTasks";
 import {
   TaskFormData,

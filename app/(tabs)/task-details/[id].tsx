@@ -26,7 +26,7 @@ import { DetailsSection } from "@/components/ui/task-details/details-section";
 import { getTaskDetailsStyles } from "@/components/ui/task-details/task-details.styles";
 import { CommonColors, DarkColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task, TaskComment } from "@/data/tasks";
+import { Task, TaskComment } from "@/types/tasks";
 import { useTasks } from "@/hooks/useTasks";
 import { tasksAPI } from "@/services/api";
 import { transformBackendTask } from "@/utils/task-transform";

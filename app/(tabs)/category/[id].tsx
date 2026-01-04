@@ -21,7 +21,7 @@ import {
   TextColors,
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task } from "@/data/tasks";
+import { Task } from "@/types/tasks";
 import { useFetchTasks } from "@/hooks/useFetchTasks";
 import { useCategories } from "@/hooks/useCategories";
 
