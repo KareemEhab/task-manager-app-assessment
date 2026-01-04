@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CalendarTab } from "@/components/ui/calendar/calendar-tab";
 import { getCalendarStyles } from "@/components/ui/calendar/calendar.styles";
 import { useTheme } from "@/contexts/theme-context";
-import { tasks } from "@/data/tasks";
+import { getAllTasks } from "@/data/task-manager";
 
 export default function CalendarScreen() {
   const { isDark } = useTheme();
@@ -13,7 +13,7 @@ export default function CalendarScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <StatusBar style={isDark ? "light" : "dark"} />
-      <CalendarTab tasks={tasks} />
+      <CalendarTab tasks={getAllTasks()} />
     </SafeAreaView>
   );
 }
