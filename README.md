@@ -227,28 +227,29 @@ Before you begin, ensure you have the following installed:
 
 ## Backend
 
-This application requires a backend API to function properly. The backend is a separate Node.js/Express application.
+**Note**: The application comes with a **pre-configured live backend server** that is ready to use out of the box. You don't need to set up or configure anything unless you want to use your own backend server.
 
-### Backend Repository
+### Default Backend Configuration
 
-- **GitHub**: [task-manager-app-backend](https://github.com/KareemEhab/task-manager-app-backend)
-- **Live Server**: [Netlify Deployment](https://iridescent-otter-de871f.netlify.app/)
+- **Live Server**: The backend API URL is already configured in `app.json` and the app will connect to the live backend automatically
+- **Backend Repository**: [task-manager-app-backend](https://github.com/KareemEhab/task-manager-app-backend)
 
-### Backend Setup
+### Using Your Own Backend (Optional)
 
-To run the backend locally or deploy it:
+If you want to use your own backend server instead of the default one:
 
 1. Visit the [backend repository](https://github.com/KareemEhab/task-manager-app-backend)
 2. Follow the setup instructions in its README
 3. Configure your MongoDB connection
 4. Set up environment variables
-5. Update the API URL in `app.json` if using a different backend:
+5. Deploy your backend or run it locally
+6. Update the API URL in `app.json`:
 
    ```json
    {
      "expo": {
        "extra": {
-         "apiUrl": "https://your-backend-url.com/api"
+         "apiUrl": "https://your-backend-url.com"
        }
      }
    }
