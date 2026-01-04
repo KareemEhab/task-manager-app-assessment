@@ -1,6 +1,11 @@
 import { useState } from "react";
 
 import { Task, TaskComment } from "@/data/tasks";
+import {
+  addTask,
+  deleteTask as deleteTaskFromData,
+  updateTask as updateTaskInData,
+} from "@/data/task-manager";
 
 type UseTasksOptions = {
   onTaskUpdate: (taskId: string, updates: Partial<Task>) => void;
@@ -56,6 +61,7 @@ export function useTasks({
       // const response = await api.deleteTask(taskId);
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
+      deleteTaskFromData(taskId);
       onTaskDelete(taskId);
       setIsDeleting(false);
       setToastMessage("Task was successfully deleted");
@@ -63,6 +69,45 @@ export function useTasks({
     } catch (error) {
       setIsDeleting(false);
       setToastMessage("Failed to delete task");
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
+    }
+  };
+
+  const createTask = async (task: Task) => {
+    try {
+      // TODO: Replace with actual API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      addTask(task);
+      setToastMessage("Task was created successfully");
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
+    } catch (error) {
+      setToastMessage("Failed to create task");
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
+    }
+  };
+
+  const updateTask = async (taskId: string, updates: Partial<Task>) => {
+    try {
+      // TODO: Replace with actual API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      updateTaskInData(taskId, updates);
+      onTaskUpdate(taskId, updates);
+      setToastMessage("Task was updated successfully");
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
+    } catch (error) {
+      setToastMessage("Failed to update task");
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
@@ -129,6 +174,8 @@ export function useTasks({
     deleteTask,
     addComment,
     deleteComment,
+    createTask,
+    updateTask,
   };
 }
 

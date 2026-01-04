@@ -1,7 +1,9 @@
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { useState } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { AddTaskModal } from "@/components/modals/add-task-modal";
 import {
   BrandColors,
   CommonColors,
@@ -58,10 +60,14 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const styles = getStyles(isDark, insets.bottom);
+  const [showAddTaskModal, setShowAddTaskModal] = useState(false);
 
   const handleAddPress = () => {
-    // Handle add task action
-    console.log("Add task pressed");
+    setShowAddTaskModal(true);
+  };
+
+  const handleTaskAdded = () => {
+    // Tasks will refresh automatically via useFocusEffect in home screen
   };
 
   const isRouteFocused = (routeName: string) => {
@@ -127,6 +133,12 @@ export function CustomTabBar({ state, descriptors }: BottomTabBarProps) {
           onPress={() => handleTabPress("calendar")}
         />
       </View>
+
+      <AddTaskModal
+        visible={showAddTaskModal}
+        onClose={() => setShowAddTaskModal(false)}
+        onTaskAdded={handleTaskAdded}
+      />
     </View>
   );
 }

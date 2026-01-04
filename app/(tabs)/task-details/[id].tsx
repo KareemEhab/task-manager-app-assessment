@@ -21,12 +21,14 @@ import { Tabs } from "@/components/common/tabs/tabs";
 import { Toast } from "@/components/common/toast";
 import { DeleteCommentModal } from "@/components/modals/delete-comment-modal";
 import { DeleteTaskModal } from "@/components/modals/delete-task-modal";
+import { EditTaskModal } from "@/components/modals/edit-task-modal";
 import { CommentsSection } from "@/components/ui/task-details/comments-section";
 import { DetailsSection } from "@/components/ui/task-details/details-section";
 import { getTaskDetailsStyles } from "@/components/ui/task-details/task-details.styles";
 import { CommonColors, DarkColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { Task, TaskComment, tasks } from "@/data/tasks";
+import { getTaskById } from "@/data/task-manager";
+import { Task, TaskComment } from "@/data/tasks";
 import { useTasks } from "@/hooks/useTasks";
 
 export default function TaskDetailsScreen() {
@@ -37,6 +39,7 @@ export default function TaskDetailsScreen() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [commentToDeleteIndex, setCommentToDeleteIndex] = useState<
     number | null
   >(null);
@@ -73,7 +76,7 @@ export default function TaskDetailsScreen() {
   // Load task on mount
   useEffect(() => {
     if (id) {
-      const foundTask = tasks.find((t) => t.id === id);
+      const foundTask = getTaskById(id);
       if (foundTask) {
         setTask(foundTask);
         setComments(foundTask.comments || []);
@@ -137,7 +140,8 @@ export default function TaskDetailsScreen() {
   const styles = getTaskDetailsStyles(isDark);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <>
+      <SafeAreaView style={styles.container} edges={["top"]}>
       <StatusBar style={isDark ? "light" : "dark"} />
       <KeyboardAvoidingView
         style={styles.container}
@@ -167,10 +171,7 @@ export default function TaskDetailsScreen() {
           <Text style={styles.title}>Task</Text>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => {
-              // Handle edit
-              console.log("Edit task");
-            }}
+            onPress={() => setShowEditModal(true)}
             activeOpacity={0.7}
           >
             <Ionicons
@@ -321,6 +322,30 @@ export default function TaskDetailsScreen() {
           onHide={() => setShowToast(false)}
         />
       </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+
+      {task && (
+        <EditTaskModal
+          visible={showEditModal}
+          task={task}
+          onClose={() => setShowEditModal(false)}
+          onTaskUpdated={() => {
+            // Refresh task data
+            if (id) {
+              const updatedTask = getTaskById(id);
+              if (updatedTask) {
+                setTask(updatedTask);
+                setComments(updatedTask.comments || []);
+              }
+            }
+            setShowEditModal(false);
+          }}
+          onTaskDeleted={() => {
+            setShowEditModal(false);
+            handleDelete();
+          }}
+        />
+      )}
+    </>
   );
 }

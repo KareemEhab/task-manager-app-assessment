@@ -17,7 +17,8 @@ import {
 } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
 import { categories } from "@/data/categories";
-import { Task, tasks } from "@/data/tasks";
+import { getAllTasks } from "@/data/task-manager";
+import { Task } from "@/data/tasks";
 
 const getStyles = (isDark: boolean) =>
   StyleSheet.create({
@@ -59,7 +60,7 @@ const getStyles = (isDark: boolean) =>
 export default function HomeScreen() {
   const { isDark } = useTheme();
   const styles = getStyles(isDark);
-  const [allTasks, setAllTasks] = useState<Task[]>(tasks);
+  const [allTasks, setAllTasks] = useState<Task[]>(getAllTasks());
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const params = useLocalSearchParams<{ deletedTaskId?: string }>();
@@ -74,10 +75,8 @@ export default function HomeScreen() {
         try {
           const deletedTaskId = await AsyncStorage.getItem("deletedTaskId");
           if (deletedTaskId) {
-            // Remove task from list
-            setAllTasks((prevTasks) =>
-              prevTasks.filter((t) => t.id !== deletedTaskId)
-            );
+            // Refresh tasks from task manager
+            setAllTasks(getAllTasks());
 
             // Show toast
             setToastMessage("Task was successfully deleted");
@@ -90,6 +89,9 @@ export default function HomeScreen() {
             setTimeout(() => {
               setShowToast(false);
             }, 2000);
+          } else {
+            // Refresh tasks on focus
+            setAllTasks(getAllTasks());
           }
         } catch (error) {
           console.log("Error checking deleted task:", error);
