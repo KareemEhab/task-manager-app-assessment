@@ -83,7 +83,8 @@ export function Input({
                 ? DarkColors.dark3
                 : LightColors.light1,
             },
-            isFilled && inputStyles.inputFilled,
+            // Only apply inputFilled in light mode (it overrides dark background)
+            isFilled && !isDark && inputStyles.inputFilled,
             hasError && inputStyles.inputError,
           ]}
         >
