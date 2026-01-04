@@ -1,10 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  findNodeHandle,
+  InteractionManager,
   Pressable,
   ScrollView,
   Text,
   TouchableOpacity,
+  UIManager,
   View,
 } from "react-native";
 
@@ -23,6 +26,7 @@ type DropdownProps = {
   options: DropdownOption[];
   onChange: (value: string) => void;
   error?: string;
+  scrollViewRef?: React.RefObject<ScrollView> | React.RefObject<any>; // For BottomSheetScrollView compatibility
 };
 
 let dropdownZIndex = 1000;
@@ -33,9 +37,11 @@ export function Dropdown({
   options,
   onChange,
   error,
+  scrollViewRef,
 }: DropdownProps) {
   const { isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<View>(null);
   const [zIndex] = useState(() => {
     dropdownZIndex += 10;
     return dropdownZIndex;
@@ -45,8 +51,70 @@ export function Dropdown({
   const selectedOption = options.find((opt) => opt.value === value);
   const styles = getDropdownStyles(isDark, isFilled, hasError, zIndex, isOpen);
 
+  // Auto-scroll to dropdown when it opens
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      // Wait for the dropdown to render and then scroll
+      InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
+          containerRef.current?.measure((x, y, width, height, pageX, pageY) => {
+            // If a ScrollView ref is provided, scroll to the dropdown position
+            if (scrollViewRef?.current) {
+              try {
+                // Calculate scroll offset (position - some padding)
+                // pageY is relative to the window, we need to account for the ScrollView's contentOffset
+                const scrollOffset = Math.max(0, pageY - 150); // 150px padding from top
+                
+                // For regular ScrollView and BottomSheetScrollView (both extend ScrollView)
+                if (scrollViewRef.current.scrollTo) {
+                  scrollViewRef.current.scrollTo({
+                    y: scrollOffset,
+                    animated: true,
+                  });
+                }
+                // Fallback: Try scrollToOffset for BottomSheetScrollView (if available)
+                else if (typeof scrollViewRef.current.scrollToOffset === 'function') {
+                  scrollViewRef.current.scrollToOffset({
+                    offset: scrollOffset,
+                    animated: true,
+                  });
+                }
+              } catch (e) {
+                // Silently fail if scroll fails
+                console.log("Could not scroll to dropdown:", e);
+              }
+            } else {
+              // Fallback: Try to find parent ScrollView automatically
+              const handle = findNodeHandle(containerRef.current);
+              if (handle) {
+                try {
+                  // Measure layout relative to root
+                  UIManager.measureLayout(
+                    handle,
+                    null,
+                    (x, y, width, height) => {
+                      // Position relative to root - could use this for window scrolling
+                      // but without ScrollView ref, we can't scroll programmatically
+                    },
+                    () => {} // onFailure
+                  );
+                } catch (e) {
+                  // Silently fail
+                }
+              }
+            }
+          });
+        }, 150); // Small delay to ensure dropdown is rendered
+      });
+    }
+  }, [isOpen, scrollViewRef]);
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <View style={styles.container}>
+    <View ref={containerRef} style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.dropdownContainer}>
         <TouchableOpacity
@@ -55,7 +123,7 @@ export function Dropdown({
             isFilled && styles.dropdownFilled,
             hasError && styles.dropdownError,
           ]}
-          onPress={() => setIsOpen(!isOpen)}
+          onPress={handleToggle}
           activeOpacity={0.7}
         >
           <Text style={[styles.dropdownText, !value && styles.placeholder]}>
