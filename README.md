@@ -45,6 +45,14 @@ Task Manager App is a comprehensive mobile application that helps you organize, 
 - 🔔 **Toast Notifications**: Non-blocking toast notifications that don't interfere with interactions
 - 📱 **Auto-scroll**: Inputs and dropdowns auto-scroll into view when focused in modals
 
+### Screenshots
+
+<div style="display: flex; gap: 10px;">
+  <img src="./assets/images/IMG_3271.webp" alt="Onboarding Screen 1" width="30%" />
+  <img src="./assets/images/IMG_3272.webp" alt="Onboarding Screen 2" width="30%" />
+  <img src="./assets/images/IMG_3273.webp" alt="Onboarding Screen 3" width="30%" />
+</div>
+
 ### Links
 
 - **Backend Repository**: [GitHub](https://github.com/KareemEhab/task-manager-app-backend)
