@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
 
 import { BrandColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
@@ -50,26 +50,33 @@ export function CategoriesInput({
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputContainer}>
-        <BottomSheetTextInput
+        <View
           style={[
-            styles.input,
+            styles.inputWrapper,
             isFilled && styles.inputFilled,
             hasError && styles.inputError,
           ]}
-          placeholder="Add Categories (Press Enter)"
-          placeholderTextColor={TextColors.placeholder}
-          value={inputValue}
-          onChangeText={setInputValue}
-          onSubmitEditing={handleAddCategory}
-          onKeyPress={handleKeyPress}
-          autoComplete="off"
-          autoCorrect={false}
-          spellCheck={false}
-          importantForAutofill="no"
-          textContentType="none"
-          editable={true}
-          autoFocus={false}
-        />
+        >
+          <BottomSheetTextInput
+            style={styles.input}
+            placeholder="Add Categories (Press Enter)"
+            placeholderTextColor={TextColors.placeholder}
+            value={inputValue}
+            onChangeText={setInputValue}
+            onSubmitEditing={handleAddCategory}
+            onKeyPress={handleKeyPress}
+            autoComplete="off"
+            autoCorrect={false}
+            spellCheck={false}
+            importantForAutofill="no"
+            textContentType="none"
+            editable={true}
+            autoFocus={false}
+            {...(Platform.OS === "android"
+              ? ({ includeFontPadding: false } as any)
+              : {})} // Remove Android's default font padding
+          />
+        </View>
         <TouchableOpacity
           style={styles.addButton}
           onPress={handleAddCategory}

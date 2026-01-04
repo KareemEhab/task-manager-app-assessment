@@ -21,21 +21,43 @@ export const inputStyles = StyleSheet.create({
     position: "relative",
   },
   input: {
-    height: 52,
+    flex: 1,
+    padding: 0, // Padding handled by wrapper View
+    fontSize: 16,
+    lineHeight: 20,
+    color: TextColors.primary,
     backgroundColor: "transparent",
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    height: 52,
+    padding: 16,
     borderWidth: 1,
     borderColor: LightColors.light1,
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingRight: 50,
-    fontSize: 16,
-    color: TextColors.primary,
+    backgroundColor: "transparent",
   },
-  textarea: {
-    height: 100,
+  inputWrapperPassword: {
+    paddingRight: 50, // Extra space for eye icon
+  },
+  textareaWrapper: {
+    minHeight: 100,
+    paddingLeft: 16,
+    paddingRight: 16,
     paddingTop: 12,
     paddingBottom: 12,
-    paddingRight: 16,
+    borderWidth: 1,
+    borderColor: LightColors.light1,
+    borderRadius: 12,
+    backgroundColor: "transparent",
+  },
+  textarea: {
+    flex: 1,
+    padding: 0, // Padding handled by wrapper View
+    lineHeight: 20,
+    fontSize: 16,
+    backgroundColor: "transparent",
   },
   inputFilled: {
     backgroundColor: LightColors.light3,
@@ -61,4 +83,3 @@ export const inputStyles = StyleSheet.create({
     color: CommonColors.error,
   },
 });
-

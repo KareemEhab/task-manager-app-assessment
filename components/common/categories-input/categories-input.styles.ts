@@ -28,14 +28,13 @@ export const getCategoriesInputStyles = (
       alignItems: "center",
       gap: 8,
     },
-    input: {
+    inputWrapper: {
       flex: 1,
       height: 52,
-      backgroundColor: isDark
-        ? DarkColors.darkText
-        : isFilled
-          ? LightColors.light3
-          : "transparent",
+      paddingLeft: 16,
+      paddingRight: 16,
+      paddingTop: 16,
+      paddingBottom: 16,
       borderWidth: 1,
       borderColor: hasError
         ? CommonColors.error
@@ -45,9 +44,22 @@ export const getCategoriesInputStyles = (
             ? DarkColors.dark3
             : LightColors.light1,
       borderRadius: 12,
-      paddingHorizontal: 16,
+      backgroundColor: isDark
+        ? DarkColors.darkText
+        : isFilled
+          ? LightColors.light3
+          : "transparent",
+    },
+    input: {
+      flex: 1,
+      paddingLeft: 0, // Padding handled by wrapper View
+      paddingRight: 0, // Padding handled by wrapper View
+      paddingTop: 0, // Padding handled by wrapper View
+      paddingBottom: 0, // Padding handled by wrapper View
       fontSize: 16,
+      lineHeight: 20, // Ensure consistent line height for text alignment
       color: isDark ? CommonColors.white : TextColors.primary,
+      backgroundColor: "transparent", // Transparent since wrapper handles background
     },
     inputFilled: {
       backgroundColor: isDark ? DarkColors.darkText : LightColors.light3,

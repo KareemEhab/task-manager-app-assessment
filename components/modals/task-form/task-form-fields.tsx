@@ -10,6 +10,7 @@ type TaskFormFieldsProps = {
   errors: TaskFormErrors;
   onFieldChange: (field: keyof TaskFormData, value: any) => void;
   minimumDate?: Date;
+  scrollViewRef?: React.RefObject<any>; // For auto-scrolling dropdowns
 };
 
 const priorityOptions = [
@@ -30,6 +31,7 @@ export function TaskFormFields({
   errors,
   onFieldChange,
   minimumDate,
+  scrollViewRef,
 }: TaskFormFieldsProps) {
   return (
     <>
@@ -81,6 +83,7 @@ export function TaskFormFields({
         options={priorityOptions}
         onChange={(value) => onFieldChange("priority", value as TaskPriority)}
         error={errors.priority}
+        scrollViewRef={scrollViewRef}
       />
 
       <Dropdown
@@ -89,6 +92,7 @@ export function TaskFormFields({
         options={statusOptions}
         onChange={(value) => onFieldChange("status", value as TaskStatus)}
         error={errors.status}
+        scrollViewRef={scrollViewRef}
       />
     </>
   );

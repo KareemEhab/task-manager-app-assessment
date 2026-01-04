@@ -1,5 +1,5 @@
 import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Keyboard, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -40,6 +40,7 @@ export function EditTaskModal({
 }: EditTaskModalProps) {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const scrollViewRef = useRef<BottomSheetScrollView>(null);
   const [formData, setFormData] = useState<TaskFormData>({
     title: "",
     description: "",
@@ -159,6 +160,7 @@ export function EditTaskModal({
         snapPoints={["60%", "95%"]}
       >
         <BottomSheetScrollView
+          ref={scrollViewRef}
           style={styles.scrollView}
           contentContainerStyle={[styles.scrollContent]}
           keyboardShouldPersistTaps="handled"
@@ -202,6 +204,7 @@ export function EditTaskModal({
               errors={errors}
               onFieldChange={handleFieldChange}
               minimumDate={task.createdOn || new Date()}
+              scrollViewRef={scrollViewRef}
             />
           </View>
         </BottomSheetScrollView>

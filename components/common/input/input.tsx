@@ -1,8 +1,21 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
-import { Text, TextInput, TextInputProps, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  Text,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-import { BrandColors, CommonColors, DarkColors, LightColors, TextColors } from "@/constants/theme";
+import {
+  BrandColors,
+  CommonColors,
+  DarkColors,
+  LightColors,
+  TextColors,
+} from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
 import { inputStyles } from "./input.styles";
 
@@ -12,10 +25,6 @@ export type InputProps = TextInputProps & {
   error?: string;
   type?: "text" | "password" | "email" | "textarea";
   variant?: "default" | "textarea";
-  /**
-   * Theme mode for this input. Use "light" to keep auth screens consistent
-   * even when the app is in dark mode.
-   */
   themeMode?: "auto" | "light" | "dark";
 };
 
@@ -34,8 +43,7 @@ export function Input({
   ...props
 }: InputProps) {
   const { isDark: appIsDark } = useTheme();
-  const isDark =
-    themeMode === "auto" ? appIsDark : themeMode === "dark";
+  const isDark = themeMode === "auto" ? appIsDark : themeMode === "dark";
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const isPassword = type === "password";
   const isTextarea = variant === "textarea" || type === "textarea";
@@ -57,48 +65,67 @@ export function Input({
         {label}
       </Text>
       <View style={inputStyles.inputContainer}>
-        <TextInput
-          editable={props.editable !== false}
-          {...props}
+        <View
           style={[
-            inputStyles.input,
-            isTextarea && inputStyles.textarea,
-            isFilled && inputStyles.inputFilled,
-            hasError && inputStyles.inputError,
+            isTextarea ? inputStyles.textareaWrapper : inputStyles.inputWrapper,
+            isPassword && !isTextarea && inputStyles.inputWrapperPassword,
             {
-              // Always use a dark surface in dark mode (avoid "transparent"/light looking fields)
               backgroundColor: isDark
                 ? DarkColors.darkText
                 : isFilled
-                  ? LightColors.light3
-                  : "transparent",
+                ? LightColors.light3
+                : "transparent",
               borderColor: hasError
                 ? CommonColors.error
                 : isFilled
-                  ? BrandColors.main
-                  : isDark
-                    ? DarkColors.dark3
-                    : LightColors.light1,
-              color: isDark ? CommonColors.white : TextColors.primary,
+                ? BrandColors.main
+                : isDark
+                ? DarkColors.dark3
+                : LightColors.light1,
             },
+            isFilled && inputStyles.inputFilled,
+            hasError && inputStyles.inputError,
           ]}
-          placeholder={placeholder}
-          placeholderTextColor={isDark ? DarkColors.dark4 : TextColors.placeholder}
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={isPassword && !isPasswordVisible}
-          autoCapitalize={type === "email" ? "none" : "sentences"}
-          keyboardType={type === "email" ? "email-address" : props.keyboardType || "default"}
-          multiline={isTextarea}
-          numberOfLines={isTextarea ? 4 : undefined}
-          textAlignVertical={isTextarea ? "top" : "center"}
-          autoComplete={autoComplete || "off"}
-          autoCorrect={false}
-          spellCheck={false}
-          importantForAutofill="no"
-          textContentType={textContentType || "none"}
-          autoFocus={autoFocus || false}
-        />
+        >
+          <TextInput
+            editable={props.editable !== false}
+            {...props}
+            style={[
+              inputStyles.input,
+              isTextarea && inputStyles.textarea,
+              {
+                backgroundColor: "transparent",
+                color: isDark ? CommonColors.white : TextColors.primary,
+              },
+              props.style, // Apply any custom styles from props
+            ]}
+            placeholder={placeholder}
+            placeholderTextColor={
+              isDark ? DarkColors.dark4 : TextColors.placeholder
+            }
+            value={value}
+            onChangeText={onChangeText}
+            secureTextEntry={isPassword && !isPasswordVisible}
+            autoCapitalize={type === "email" ? "none" : "sentences"}
+            keyboardType={
+              type === "email"
+                ? "email-address"
+                : props.keyboardType || "default"
+            }
+            multiline={isTextarea}
+            numberOfLines={isTextarea ? 4 : undefined}
+            textAlignVertical={isTextarea ? "top" : "center"}
+            autoComplete={autoComplete || "off"}
+            autoCorrect={false}
+            spellCheck={false}
+            importantForAutofill="no"
+            textContentType={textContentType || "none"}
+            autoFocus={autoFocus || false}
+            {...(Platform.OS === "android"
+              ? ({ includeFontPadding: false } as any)
+              : {})} // Remove Android's default font padding
+          />
+        </View>
         {isPassword && (
           <TouchableOpacity
             style={inputStyles.eyeIcon}
@@ -121,4 +148,3 @@ export function Input({
     </View>
   );
 }
-
