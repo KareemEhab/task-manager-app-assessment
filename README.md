@@ -33,21 +33,22 @@ Task Manager App is a comprehensive mobile application that helps you organize, 
 - 📁 **Categories**: Organize tasks by categories with visual statistics
 - 🎯 **Priorities**: Set task priorities (low, medium, high)
 - 📅 **Due Dates**: Track task deadlines with date picker
-- 👥 **Assignment**: Assign tasks to team members via email
-- 💬 **Comments**: Add comments to tasks with timestamps
+- 👥 **Task Assignment**: Assign tasks to team members via email
+- 📋 **Task Status**: Multiple status options (upcoming, in-progress, in-review, completed)
+- 🔢 **Task Counts**: See task counts in tabs (e.g., "Active (5)")
+- 👤 **Assigned to Others**: Dedicated tab for tasks you created but assigned to others
+- 💬 **Comments**: Add comments to tasks with timestamps and user names
 - 🌓 **Dark Mode**: Automatic dark/light mode support
 - 🔐 **Authentication**: Secure sign-in and sign-up with JWT
 - 📊 **Statistics**: View category-wise task completion statistics
 - 🔄 **Real-time Updates**: Optimistic UI updates for instant feedback
-
-### Screenshots
-
-_Add your app screenshots here_
+- 🔔 **Toast Notifications**: Non-blocking toast notifications that don't interfere with interactions
+- 📱 **Auto-scroll**: Inputs and dropdowns auto-scroll into view when focused in modals
 
 ### Links
 
 - **Backend Repository**: [GitHub](https://github.com/KareemEhab/task-manager-app-backend)
-- **Backend Live Server**: [Netlify](https://clever-crostata-002ddb.netlify.app/)
+- **Backend Live Server**: [Netlify](https://iridescent-otter-de871f.netlify.app/)
 
 ---
 
@@ -57,14 +58,7 @@ The UI/UX design of this application was inspired by the following Figma communi
 
 1. **[Task Management - A Mobile App UI Kit](https://www.figma.com/community/file/1511353615262415613/task-management-a-mobile-app-ui-kit)**
 
-   - Modern task management interface
-   - Clean and intuitive navigation
-   - Beautiful color schemes and typography
-
 2. **[Task Management App Design](https://www.figma.com/community/file/1025672621370192050)**
-   - Innovative card-based layouts
-   - Smooth animations and transitions
-   - User-friendly interaction patterns
 
 These designs served as the foundation for creating a polished, professional task management experience.
 
@@ -161,7 +155,7 @@ Before you begin, ensure you have the following installed:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-username/task-manager-app.git
+   git clone https://github.com/KareemEhab/task-manager-app-assessment
    ```
 
 2. **Navigate to the project directory**
@@ -238,7 +232,7 @@ This application requires a backend API to function properly. The backend is a s
 ### Backend Repository
 
 - **GitHub**: [task-manager-app-backend](https://github.com/KareemEhab/task-manager-app-backend)
-- **Live Server**: [Netlify Deployment](https://clever-crostata-002ddb.netlify.app/)
+- **Live Server**: [Netlify Deployment](https://iridescent-otter-de871f.netlify.app/)
 
 ### Backend Setup
 
@@ -267,13 +261,14 @@ The backend provides the following main endpoints:
 - `POST /api/users` – User registration
 - `POST /api/auth` – User authentication
 - `GET /api/users/me` – Get current user
-- `GET /api/tasks` – Get all tasks
+- `GET /api/tasks` – Get all tasks assigned to the current user
+- `GET /api/tasks/created-by-me` – Get tasks created by the user but assigned to others
 - `POST /api/tasks` – Create a task
 - `PUT /api/tasks/:id` – Update a task
 - `DELETE /api/tasks/:id` – Delete a task (soft delete)
 - `GET /api/tasks/categories` – Get category statistics
-- `POST /api/tasks/:id/comments` – Add a comment
-- `DELETE /api/tasks/:id/comments/:commentId` – Delete a comment
+- `POST /api/tasks/:id/comments` – Add a comment to a task
+- `DELETE /api/tasks/:id/comments/:commentId` – Delete a comment (soft delete)
 
 ---
 
@@ -292,30 +287,46 @@ The backend provides the following main endpoints:
 - **Create Tasks**: Add tasks with title, description, priority, status, due date, categories, and assignment
 - **Update Tasks**: Edit any task details
 - **Delete Tasks**: Soft delete (tasks are marked as deleted, not permanently removed)
+- **Task Status**: Multiple status options:
+  - **Upcoming**: Tasks that haven't started yet
+  - **In Progress**: Tasks currently being worked on
+  - **In Review**: Tasks awaiting review
+  - **Completed**: Finished tasks
 - **Mark as Done**: Change task status to completed
-- **Filter Tasks**: View active or completed tasks
-- **Task Details**: View full task information with comments
+- **Filter Tasks**: View active, completed, or assigned-to-others tasks
+- **Task Counts**: See the number of tasks in each tab (e.g., "Active (5)", "Completed (3)")
+- **Assigned to Others**: Dedicated tab showing tasks you created but assigned to other team members
+- **Task Details**: View full task information with comments, assignment details, and metadata
+- **Assigned To Display**: Shows "You" if assigned to current user, otherwise displays assigned user's email
 
 ### Categories
 
-- **Dynamic Categories**: Categories are automatically generated from tasks
+- **Dynamic Categories**: Categories are automatically generated from tasks assigned to you
+- **Smart Filtering**: Categories only show tasks assigned to the current user (excludes tasks you created but assigned to others)
 - **Statistics**: View task count and completion percentage per category
-- **Category View**: Filter tasks by specific category
+- **Category View**: Filter tasks by specific category with date sorting (newest first)
 - **Visual Indicators**: Beautiful gradient cards for each category
+- **Real-time Updates**: Category statistics update automatically when tasks are completed or status changes
 
 ### Comments
 
 - **Add Comments**: Add comments to tasks with your name and timestamp
 - **View Comments**: See all comments with author names and timestamps
-- **Delete Comments**: Remove comments (soft delete)
+- **Delete Comments**: Remove comments (soft delete - comments are marked as deleted, not permanently removed)
+- **Comment Management**: Comments are tied to tasks and support full CRUD operations
 
 ### User Experience
 
 - **Optimistic Updates**: Instant UI updates without waiting for server response
-- **Global State**: Tasks managed globally using React Context
+- **Global State**: Tasks managed globally using React Context API for efficient state management
+- **Non-blocking Toasts**: Toast notifications don't block user interactions - you can continue using the app while toasts are visible
+- **Auto-scroll**: Inputs, dropdowns, and date pickers automatically scroll into view when focused in modals
+- **Navigation Protection**: Prevents accidental swipe-back navigation to onboarding when logged in
 - **Dark Mode**: Automatic theme switching based on system preferences
-- **Smooth Animations**: Polished transitions and interactions
+- **Smooth Animations**: Polished transitions and interactions with React Native Reanimated
 - **Error Handling**: User-friendly error messages and toast notifications
+- **Loading States**: Clear loading indicators during API operations
+- **Empty States**: Helpful messages when no tasks or categories exist
 
 ---
 
@@ -353,7 +364,3 @@ This project is private and not licensed for public use.
 - Design inspiration from the Figma community designs mentioned above
 - Expo team for the amazing development platform
 - React Native community for excellent libraries and support
-
----
-
-**Made with ❤️ using React Native and Expo**
