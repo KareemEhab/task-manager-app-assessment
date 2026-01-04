@@ -88,13 +88,7 @@ export default function CategoryTasksScreen() {
   const { categories, isLoading: categoriesLoading, refetch: refetchCategories } =
     useCategories();
 
-  // Refresh data when screen focuses
-  useFocusEffect(
-    useCallback(() => {
-      refetchTasks();
-      refetchCategories();
-    }, [refetchTasks, refetchCategories])
-  );
+  // Tasks and categories are managed by context, no need to refetch on focus
 
   // Find the category by ID
   const category = useMemo(() => {

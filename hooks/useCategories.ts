@@ -20,6 +20,7 @@ export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const fetchCategories = useCallback(async () => {
     // Check if user is authenticated
@@ -27,10 +28,14 @@ export function useCategories() {
     if (!token) {
       setIsLoading(false);
       setCategories([]);
+      setHasLoaded(true);
       return;
     }
 
-    setIsLoading(true);
+    // Only show loading if we haven't loaded before
+    if (!hasLoaded) {
+      setIsLoading(true);
+    }
     setError(null);
 
     try {
@@ -46,6 +51,7 @@ export function useCategories() {
       }));
 
       setCategories(transformedCategories);
+      setHasLoaded(true);
     } catch (err: any) {
       // Don't show error if it's a 401 (unauthorized) or network error when not authenticated
       if (err.response?.status === 401 || !err.response) {
@@ -56,18 +62,22 @@ export function useCategories() {
         setError(errorMessage);
         console.error("Error fetching categories:", err);
       }
+      setHasLoaded(true);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [hasLoaded]);
 
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    // Only fetch on initial mount if not already loaded
+    if (!hasLoaded) {
+      fetchCategories();
+    }
+  }, []); // Empty dependency array - only run once
 
   return {
     categories,
-    isLoading,
+    isLoading: isLoading && !hasLoaded, // Only show loading if we haven't loaded before
     error,
     refetch: fetchCategories,
   };

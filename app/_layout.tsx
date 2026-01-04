@@ -14,6 +14,7 @@ import {
   ThemeProvider as AppThemeProvider,
   useTheme,
 } from "@/contexts/theme-context";
+import { TasksProvider } from "@/contexts/tasks-context";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -39,9 +40,11 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AppThemeProvider>
-        <BottomSheetModalProvider>
-          <RootLayoutNav />
-        </BottomSheetModalProvider>
+        <TasksProvider>
+          <BottomSheetModalProvider>
+            <RootLayoutNav />
+          </BottomSheetModalProvider>
+        </TasksProvider>
       </AppThemeProvider>
     </GestureHandlerRootView>
   );

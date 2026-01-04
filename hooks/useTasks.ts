@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useTasksContext } from "@/contexts/tasks-context";
 import { Task, TaskComment } from "@/data/tasks";
 import { commentsAPI, tasksAPI } from "@/services/api";
 import {
@@ -8,8 +9,8 @@ import {
 } from "@/utils/task-transform";
 
 type UseTasksOptions = {
-  onTaskUpdate: (taskId: string, updates: Partial<Task>) => void;
-  onTaskDelete: (taskId: string) => void;
+  onTaskUpdate?: (taskId: string, updates: Partial<Task>) => void;
+  onTaskDelete?: (taskId: string) => void;
   onSuccess?: () => void;
 };
 
@@ -17,7 +18,13 @@ export function useTasks({
   onTaskUpdate,
   onTaskDelete,
   onSuccess,
-}: UseTasksOptions) {
+}: UseTasksOptions = {}) {
+  const {
+    updateTask: updateTaskInContext,
+    deleteTask: deleteTaskInContext,
+    addTask: addTaskInContext,
+    getTaskById,
+  } = useTasksContext();
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isMarkingDone, setIsMarkingDone] = useState(false);
@@ -29,16 +36,36 @@ export function useTasks({
   const markTaskAsDone = async (task: Task) => {
     setIsMarkingDone(true);
 
+    // Optimistic update: Update context immediately
+    const previousTask = { ...task };
+    updateTaskInContext(task.id, {
+      status: "completed",
+      lastUpdated: new Date(),
+    });
+    if (onTaskUpdate) {
+      onTaskUpdate(task.id, {
+        status: "completed",
+        lastUpdated: new Date(),
+      });
+    }
+
     try {
       const updatedTask = await tasksAPI.update(task.id, {
         status: "completed",
       });
 
       const transformedTask = transformBackendTask(updatedTask);
-      onTaskUpdate(task.id, {
+      // Update with server response
+      updateTaskInContext(task.id, {
         status: "completed",
         lastUpdated: transformedTask.lastUpdated,
       });
+      if (onTaskUpdate) {
+        onTaskUpdate(task.id, {
+          status: "completed",
+          lastUpdated: transformedTask.lastUpdated,
+        });
+      }
 
       setIsMarkingDone(false);
       setToastMessage("Task was successfully marked as done");
@@ -47,6 +74,11 @@ export function useTasks({
         setShowToast(false);
       }, 2000);
     } catch (error: any) {
+      // Rollback optimistic update on error
+      updateTaskInContext(task.id, previousTask);
+      if (onTaskUpdate) {
+        onTaskUpdate(task.id, previousTask);
+      }
       setIsMarkingDone(false);
       const errorMessage =
         error.response?.data || error.message || "Failed to mark task as done";
@@ -62,19 +94,27 @@ export function useTasks({
   const deleteTask = async (taskId: string) => {
     setIsDeleting(true);
 
+    // Optimistic update: Remove from context immediately
+    const taskToDelete = getTaskById(taskId);
+    deleteTaskInContext(taskId);
+    if (onTaskDelete) {
+      onTaskDelete(taskId);
+    }
+
     try {
       await tasksAPI.delete(taskId);
-      // Only call onTaskDelete if deletion was successful
       setIsDeleting(false);
-      // Set toast message BEFORE calling callback so it's visible
       setToastMessage("Task was successfully deleted");
       setShowToast(true);
-      // Call callback after toast is set
-      onTaskDelete(taskId);
-      // Toast will be shown by the caller, but also show it here as fallback
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2000);
     } catch (error: any) {
+      // Rollback optimistic update on error - need to add task back
+      if (taskToDelete) {
+        addTaskInContext(taskToDelete);
+      }
       setIsDeleting(false);
-      // Don't call onTaskDelete if deletion failed
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data ||
@@ -94,7 +134,12 @@ export function useTasks({
   const createTask = async (task: Task) => {
     try {
       const taskData = transformFrontendTask(task);
-      await tasksAPI.create(taskData);
+      const createdTask = await tasksAPI.create(taskData);
+      const transformedTask = transformBackendTask(createdTask);
+
+      // Add to context after successful creation
+      addTaskInContext(transformedTask);
+
       setToastMessage("Task was created successfully");
       setShowToast(true);
       setTimeout(() => {
@@ -113,20 +158,52 @@ export function useTasks({
   };
 
   const updateTask = async (taskId: string, updates: Partial<Task>) => {
+    // Get current task for rollback
+    const currentTask = getTaskById(taskId);
+    const previousTask = currentTask ? { ...currentTask } : null;
+
+    // Optimistic update: Update context immediately
+    updateTaskInContext(taskId, {
+      ...updates,
+      lastUpdated: new Date(),
+    });
+    if (onTaskUpdate) {
+      onTaskUpdate(taskId, {
+        ...updates,
+        lastUpdated: new Date(),
+      });
+    }
+
     try {
       const updateData = transformFrontendTask(updates);
       const updatedTask = await tasksAPI.update(taskId, updateData);
       const transformedTask = transformBackendTask(updatedTask);
-      onTaskUpdate(taskId, {
+
+      // Update with server response
+      updateTaskInContext(taskId, {
         ...updates,
         lastUpdated: transformedTask.lastUpdated,
       });
+      if (onTaskUpdate) {
+        onTaskUpdate(taskId, {
+          ...updates,
+          lastUpdated: transformedTask.lastUpdated,
+        });
+      }
+
       setToastMessage("Task was updated successfully");
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
       }, 2000);
     } catch (error) {
+      // Rollback optimistic update on error
+      if (previousTask) {
+        updateTaskInContext(taskId, previousTask);
+        if (onTaskUpdate) {
+          onTaskUpdate(taskId, previousTask);
+        }
+      }
       setToastMessage("Failed to update task");
       setShowToast(true);
       setTimeout(() => {
@@ -142,15 +219,50 @@ export function useTasks({
   ) => {
     if (!comment.trim()) return;
 
+    // Optimistic update: Add comment immediately
+    const tempComment: TaskComment = {
+      _id: `temp-${Date.now()}`,
+      name: "You", // Will be replaced by server response
+      comment: comment.trim(),
+      createdAt: new Date(),
+    };
+    const optimisticComments = [...currentComments, tempComment];
+    updateTaskInContext(taskId, {
+      comments: optimisticComments,
+      lastUpdated: new Date(),
+    });
+    if (onTaskUpdate) {
+      onTaskUpdate(taskId, {
+        comments: optimisticComments,
+        lastUpdated: new Date(),
+      });
+    }
+
     try {
       const updatedTask = await commentsAPI.add(taskId, comment);
       const transformedTask = transformBackendTask(updatedTask);
 
-      onTaskUpdate(taskId, {
+      // Update with server response
+      updateTaskInContext(taskId, {
         comments: transformedTask.comments,
         lastUpdated: transformedTask.lastUpdated,
       });
+      if (onTaskUpdate) {
+        onTaskUpdate(taskId, {
+          comments: transformedTask.comments,
+          lastUpdated: transformedTask.lastUpdated,
+        });
+      }
     } catch (error) {
+      // Rollback optimistic update on error
+      updateTaskInContext(taskId, {
+        comments: currentComments,
+      });
+      if (onTaskUpdate) {
+        onTaskUpdate(taskId, {
+          comments: currentComments,
+        });
+      }
       console.error("Failed to add comment:", error);
       throw error;
     }
@@ -161,32 +273,63 @@ export function useTasks({
     commentIndex: number,
     currentComments: TaskComment[]
   ) => {
+    // Get the comment ID from the current comments
+    const commentToDelete = currentComments[commentIndex];
+    if (!commentToDelete || !(commentToDelete as any)._id) {
+      throw new Error("Comment not found");
+    }
+
+    const commentId = (commentToDelete as any)._id;
+
+    // Prevent double calls by checking if this specific comment is already being deleted
+    if (deletingCommentId === commentId) {
+      console.warn("Comment deletion already in progress for this comment");
+      return;
+    }
+
+    // Optimistic update: Remove comment immediately
+    const optimisticComments = currentComments.filter(
+      (_, idx) => idx !== commentIndex
+    );
+    setDeletingCommentId(commentId);
+    updateTaskInContext(taskId, {
+      comments: optimisticComments,
+      lastUpdated: new Date(),
+    });
+    if (onTaskUpdate) {
+      onTaskUpdate(taskId, {
+        comments: optimisticComments,
+        lastUpdated: new Date(),
+      });
+    }
+
     try {
-      // Get the comment ID from the current comments
-      const commentToDelete = currentComments[commentIndex];
-      if (!commentToDelete || !(commentToDelete as any)._id) {
-        throw new Error("Comment not found");
-      }
-
-      const commentId = (commentToDelete as any)._id;
-
-      // Prevent double calls by checking if this specific comment is already being deleted
-      if (deletingCommentId === commentId) {
-        console.warn("Comment deletion already in progress for this comment");
-        return;
-      }
-
-      setDeletingCommentId(commentId); // Track which comment is being deleted
       const updatedTask = await commentsAPI.delete(taskId, commentId);
       const transformedTask = transformBackendTask(updatedTask);
 
-      onTaskUpdate(taskId, {
+      // Update with server response
+      updateTaskInContext(taskId, {
         comments: transformedTask.comments,
         lastUpdated: transformedTask.lastUpdated,
       });
-      setDeletingCommentId(null); // Clear tracking
+      if (onTaskUpdate) {
+        onTaskUpdate(taskId, {
+          comments: transformedTask.comments,
+          lastUpdated: transformedTask.lastUpdated,
+        });
+      }
+      setDeletingCommentId(null);
     } catch (error) {
-      setDeletingCommentId(null); // Clear tracking on error
+      // Rollback optimistic update on error
+      updateTaskInContext(taskId, {
+        comments: currentComments,
+      });
+      if (onTaskUpdate) {
+        onTaskUpdate(taskId, {
+          comments: currentComments,
+        });
+      }
+      setDeletingCommentId(null);
       console.error("Failed to delete comment:", error);
       throw error;
     }

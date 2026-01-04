@@ -48,8 +48,6 @@ export function AddTaskModal({
   const [showToast, setShowToast] = useState(false);
 
   const { createTask } = useTasks({
-    onTaskUpdate: () => {},
-    onTaskDelete: () => {},
     onSuccess: () => {
       handleClose();
       setShowToast(true);

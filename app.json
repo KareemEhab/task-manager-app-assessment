@@ -44,8 +44,8 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-  "extra": {
-    "apiUrl": "http://192.168.1.13:3000/api"
-  }
+    "extra": {
+      "apiUrl": "https://clever-crostata-002ddb.netlify.app/"
+    }
   }
 }

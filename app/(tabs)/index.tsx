@@ -73,13 +73,11 @@ export default function HomeScreen() {
   const hasNoData = !tasksLoading && allTasks.length === 0;
   const isLoading = tasksLoading || categoriesLoading || userLoading;
 
-  // Refresh data when screen focuses
+  // Only refetch user on focus (tasks and categories are managed by context)
   useFocusEffect(
     useCallback(() => {
-      refetchTasks();
-      refetchCategories();
       refetchUser();
-    }, [refetchTasks, refetchCategories, refetchUser])
+    }, [refetchUser])
   );
 
   const handleCreateTask = () => {
@@ -87,8 +85,8 @@ export default function HomeScreen() {
   };
 
   const handleTaskAdded = () => {
-    refetchTasks();
-    refetchCategories();
+    // Tasks are automatically updated in context, no need to refetch
+    // Categories will be recalculated automatically from tasks
   };
 
   const handleTaskPress = (task: Task) => {

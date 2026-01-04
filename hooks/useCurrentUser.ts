@@ -12,22 +12,28 @@ export function useCurrentUser() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
-  const fetchUser = useCallback(async () => {
+  const fetchUser = useCallback(async (showLoading = true) => {
     // Check if user is authenticated
     const token = await SecureStore.getItemAsync("authToken");
     if (!token) {
       setIsLoading(false);
       setUser(null);
+      setHasLoaded(true);
       return;
     }
 
-    setIsLoading(true);
+    // Only show loading on initial fetch, not on refetch
+    if (showLoading && !hasLoaded) {
+      setIsLoading(true);
+    }
     setError(null);
 
     try {
       const userData = await usersAPI.getMe();
       setUser(userData);
+      setHasLoaded(true);
     } catch (err: any) {
       // Don't show error if it's a 401 (unauthorized) - user just needs to log in
       if (err.response?.status === 401 || !err.response) {
@@ -38,20 +44,21 @@ export function useCurrentUser() {
         setError(errorMessage);
         console.error("Error fetching user:", err);
       }
+      setHasLoaded(true);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [hasLoaded]);
 
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    fetchUser(true); // Initial load with loading indicator
+  }, []); // Empty dependency array - only run once
 
   return {
     user,
-    isLoading,
+    isLoading: isLoading && !hasLoaded, // Only show loading if we haven't loaded before
     error,
-    refetch: fetchUser,
+    refetch: () => fetchUser(false), // Refetch without showing loading
   };
 }
 
