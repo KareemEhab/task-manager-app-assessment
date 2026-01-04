@@ -189,7 +189,7 @@ export function EditTaskModal({
               />
               <Button
                 variant="primary"
-                title="Update Task"
+                title="Update"
                 onPress={handleSubmit}
                 style={styles.updateButton}
                 loading={isLoading}

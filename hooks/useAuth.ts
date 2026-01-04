@@ -20,7 +20,9 @@ export function useAuth() {
       // Small delay to ensure token is stored before navigation
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Navigate to home screen
+      // Reset navigation stack - dismiss all previous screens and navigate to tabs
+      // This ensures there's no back history to onboarding
+      router.dismissAll();
       router.replace("/(tabs)");
       
       return { success: true };
@@ -47,7 +49,9 @@ export function useAuth() {
       // Small delay to ensure token is stored before navigation
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Navigate to home screen
+      // Reset navigation stack - dismiss all previous screens and navigate to tabs
+      // This ensures there's no back history to onboarding
+      router.dismissAll();
       router.replace("/(tabs)");
       
       return { success: true };

@@ -29,7 +29,13 @@ function RootLayoutNav() {
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="sign-in" options={{ headerShown: false }} />
         <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+            gestureEnabled: false, // Disable swipe gesture to prevent going back to onboarding
+          }}
+        />
       </Stack>
       <StatusBar style={theme === "dark" ? "light" : "dark"} />
     </ThemeProvider>

@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { ActivityIndicator, Modal, StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { ActivityIndicator, Animated, StyleSheet, Text, View } from "react-native";
 
 import { CommonColors, DarkColors, TextColors } from "@/constants/theme";
 import { useTheme } from "@/contexts/theme-context";
@@ -13,6 +13,23 @@ type ToastProps = {
 
 export function Toast({ visible, message, loading = false, onHide }: ToastProps) {
   const { isDark } = useTheme();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [visible, fadeAnim]);
 
   useEffect(() => {
     if (visible && !loading) {
@@ -23,46 +40,57 @@ export function Toast({ visible, message, loading = false, onHide }: ToastProps)
     }
   }, [visible, loading, onHide]);
 
+  if (!visible) return null;
+
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onHide}
-    >
-      <View style={styles.container}>
-        <View
-          style={[
-            styles.toast,
-            {
-              backgroundColor: isDark ? DarkColors.darkBorder : CommonColors.white,
-            },
-          ]}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color={CommonColors.white} />
-          ) : (
-            <Text
-              style={[
-                styles.message,
-                { color: isDark ? CommonColors.white : TextColors.primary },
-              ]}
-            >
-              {message}
-            </Text>
-          )}
-        </View>
-      </View>
-    </Modal>
+    <View style={styles.overlay} pointerEvents="box-none">
+      <Animated.View
+        style={[
+          styles.toast,
+          {
+            backgroundColor: isDark ? DarkColors.darkBorder : CommonColors.white,
+            opacity: fadeAnim,
+            transform: [
+              {
+                translateY: fadeAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [20, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+        pointerEvents="box-none"
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color={CommonColors.white} />
+        ) : (
+          <Text
+            style={[
+              styles.message,
+              { color: isDark ? CommonColors.white : TextColors.primary },
+            ]}
+          >
+            {message}
+          </Text>
+        )}
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: "flex-end",
     alignItems: "center",
     paddingBottom: 100,
+    zIndex: 9999,
+    elevation: 9999,
   },
   toast: {
     paddingHorizontal: 24,

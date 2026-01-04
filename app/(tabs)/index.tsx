@@ -1,6 +1,6 @@
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams, useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@/components/common/button/button";
@@ -72,6 +72,21 @@ export default function HomeScreen() {
   // Check if there are no tasks
   const hasNoData = !tasksLoading && allTasks.length === 0;
   const isLoading = tasksLoading || categoriesLoading || userLoading;
+
+  const navigation = useNavigation();
+
+  // Prevent back navigation to onboarding when logged in
+  useEffect(() => {
+    if (!user) return; // Only prevent if user is logged in
+
+    const unsubscribe = navigation.addListener("beforeRemove", (e) => {
+      // Prevent all back navigation when user is logged in
+      // This ensures users can't swipe back to onboarding
+      e.preventDefault();
+    });
+
+    return unsubscribe;
+  }, [navigation, user]);
 
   // Refetch user and tasks on focus (especially after login)
   useFocusEffect(
